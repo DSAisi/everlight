@@ -1,0 +1,2227 @@
+{
+  "1": {
+    "n": 1,
+    "name": "原始事件接入",
+    "service": "EventStore",
+    "table": "events_sources_outbox",
+    "up": [
+      18,
+      19,
+      21
+    ],
+    "down": [
+      2,
+      4,
+      10,
+      17
+    ],
+    "states": "received/validated/persisted/rejected/conflict/failed/unknown",
+    "ins": "可信宿主事件及scope/上游键/原文与结构",
+    "outs": "event/source/outbox/receipt同库提交回执；不作语义解释",
+    "detail_spec": "modules/R01.md"
+  },
+  "2": {
+    "n": 2,
+    "name": "局部感知编码",
+    "service": "CueEncoder",
+    "table": "cue_sets",
+    "ins": "已持久化event_id/source_revision，宿主提供发话者/收话人和引用域；原文UTF-8及可用局部映射；rule_version",
+    "outs": "CueSet：局部否定、转述线索、人称候选；可为[]，无事实写入权限",
+    "fields": [
+      [
+        "event_id/source_revision",
+        "string/int",
+        "必填；确切R01来源版本"
+      ],
+      [
+        "rule_version",
+        "string",
+        "必填；词法规则冻结版本"
+      ],
+      [
+        "kind",
+        "enum",
+        "negation/reporting_cue/pronoun"
+      ],
+      [
+        "span/start_byte/end_byte",
+        "range",
+        "必须落在实际供给原文的UTF-8字符边界"
+      ],
+      [
+        "surface/local_context",
+        "string",
+        "按原文切片；不改写句意"
+      ],
+      [
+        "attachment_candidates",
+        "array",
+        "局部挂载对象与依据；可能为空"
+      ],
+      [
+        "referent_candidates",
+        "array",
+        "仅可信发/收话人及本地已确认映射"
+      ],
+      [
+        "resolution",
+        "enum",
+        "resolved/ambiguous/unknown；不靠模型补人"
+      ],
+      [
+        "report_status/reported_subject_id",
+        "enum/nullable ID",
+        "人家本身=unconfirmed/null；明确转述另存发话者/对象/内容"
+      ]
+    ],
+    "states": "planned→encoded→validated；不合法range→rejected；来源变更→invalidated。unknown是合法编码结果，不是系统故障。",
+    "steps": [
+      "先核事件版本及授权，取本轮实际文本，不擅自抓别的会话。",
+      "标引用结构和局部边界，不清楚的引用域保留unknown。",
+      "按明确规则找不/别/没/不许；局部2–12字仅作候选窗口，短词可更短，超长标truncated。",
+      "仅为明确他说/据说等形成转述线索；人家只产生人称候选与未知对象，不自动定转述成立。",
+      "在本地域内生成候选；栖所她不自动等于用户；引用中的你不继承外层收话人。",
+      "校回原文range；无标记返回[]；向R15/R07交候选而非事实。"
+    ],
+    "algorithm": "使用可解释词法规则与有限局部结构；不仅/不错等非命题否定按词法规则排除或unknown。禁止意图推断、情绪抽取、topic归类、多跳指代。规则冲突保留多个局部候选，不强制选一。",
+    "up": [
+      1,
+      18
+    ],
+    "down": [
+      3,
+      7,
+      15,
+      23
+    ],
+    "recall": "只提供本轮线索；旧CueSet可按事件/规则版本查，不成为新经历。不以否定词相似度直接召回某个人。",
+    "inject": "通常不单独注入整份CueSet；R22仅在歧义会影响当前回答时保留必要未知/局部解释。情绪线索由现有情绪召回或独立评价器承担。",
+    "concurrency": "幂等键(event_id, source_revision, rule_version)；新规则重建派生，不能累计成多份独立证据。",
+    "example": "输入“我不走……别赶我啦”：抽不走/别赶及局部挂载；不能变成“她不来单位”。“人家自我介绍得很清楚啊”：对象unknown，不能咱们。",
+    "cases": [
+      "我不走/别赶可精确回指原文；任何改成第三人称单位事实判失败",
+      "人家对象unknown且report_status不硬判转述；填咱们判失败",
+      "天气晴朗输出空数组；添加意图/情绪/topic判失败",
+      "栖所你按本地域可信映射；引用内你不沿用外层",
+      "她缺映射时空候选；以性别/昵称猜用户判失败",
+      "不仅/不错不机械形成否定事实",
+      "多字节emoji前后range能切回相同surface",
+      "规则版本变更重建，不重复强化来源",
+      "超长否定标候选截断而非完整句法",
+      "明确他说保留发话者/谈及对象/内容不同字段",
+      "跨句多跳指代请求保持职责边界，不偷偷解析",
+      "原文被删除后CueSet停用，不靠旧缓存复活"
+    ]
+  },
+  "3": {
+    "n": 3,
+    "name": "工作记忆与承诺",
+    "service": "WorkStore",
+    "table": "working_memory",
+    "ins": "可信project/task映射，当前已保存事件，相关已有Work/Commitment版本，产物与行动回执",
+    "outs": "有版本WorkView、待办与具体承诺、焦点候选；不输出外部动作成功",
+    "fields": [
+      [
+        "work_id/project_id/task_id",
+        "ID",
+        "项目可空，task只在可信范围解析"
+      ],
+      [
+        "goal",
+        "string",
+        "当前目标与来源"
+      ],
+      [
+        "constraints/decisions",
+        "array",
+        "每条有ID、来源、适用范围与状态"
+      ],
+      [
+        "open_threads",
+        "array",
+        "未结问题及其缺口，不等于永久注入"
+      ],
+      [
+        "commitments",
+        "array",
+        "承诺者、受益对象、内容、期限可空、验收标准"
+      ],
+      [
+        "artifacts",
+        "array",
+        "document_id+revision/hash，ready与delivered分开"
+      ],
+      [
+        "next_step",
+        "nullable string",
+        "需要明确依据，不能补造用户目标"
+      ],
+      [
+        "state",
+        "enum",
+        "planned/active/blocked/paused/completed/cancelled"
+      ]
+    ],
+    "states": "planned→active；active可blocked/paused；有验收结果才completed；取消保留历史。完成后新任务创建新ID，不把旧任务改名复用。",
+    "steps": [
+      "认证项目/任务范围并读最新revision，模糊指代只留候选。",
+      "分离目标、决策、承诺和产物，不用一段滚动摘要代替全部。",
+      "明确纠正先进入约束视图，旧相反要求停用/争议。",
+      "生成更新候选，任务拆分形成父子关系但保留原验收。",
+      "完成需核R12产物及R14结果；未送达不说已交付。",
+      "CAS提交，保存焦点指针和对应outbox，触发R13及索引更新。"
+    ],
+    "algorithm": "焦点优先级：显式受权项目选择→唯一可信活跃焦点→当前输入与已有任务可核对应。多候选无足够证据不按最近文本硬选。“尽快”不自动换成日期；愿望不自动变承诺。",
+    "up": [
+      1,
+      9,
+      12,
+      14,
+      18
+    ],
+    "down": [
+      13,
+      15,
+      17,
+      22
+    ],
+    "recall": "按项目+task/state+更新时间查；查当前也读后续完成/取消。不把工作条目与永久个人偏好混库。",
+    "inject": "只有当前问题依赖进度/承诺才注入目标、最近决定、下一步、unknown结果；已在实际messages清楚表达时不再复制。",
+    "concurrency": "单对象expected_revision；并发任务更新须字段/子项版本合并或冲突返回，不能摘要后写覆盖新决定。",
+    "example": "A长明→B栖所→A：恢复A文件版本及待补项，不带B设计进度。文件已写但发送unknown，分别报告。",
+    "cases": [
+      "A/B/A恢复正确项目下一步",
+      "两个同名任务不合并",
+      "这个做完了指代不明不批量完成",
+      "文件ready但delivery未知不当交付完成",
+      "尽快保留模糊期限，不自动排明天",
+      "用户改保留颜色，旧后台不能覆盖",
+      "取消任务不被旧checkpoint复活",
+      "愿望/建议/承诺分开",
+      "部分子项完成不关闭所有子任务",
+      "项目权限撤回后焦点不再供给",
+      "模糊继续可候选澄清，不自造任务",
+      "当前话题无关不注入未结总表"
+    ]
+  },
+  "4": {
+    "n": 4,
+    "name": "情景记忆",
+    "service": "EpisodeStore",
+    "table": "episodic_memory",
+    "ins": "R01事件与完整度，参与者候选、发生时间/偏序，相关前后片段及后续来源",
+    "outs": "有序或偏序Episode、逐项摘要引用、后续链接和completeness",
+    "fields": [
+      [
+        "episode_id",
+        "ID",
+        "经历稳定ID"
+      ],
+      [
+        "event_refs",
+        "array",
+        "有版本来源及已知顺序；不可只存摘要"
+      ],
+      [
+        "participants",
+        "array",
+        "人物候选、角色、知情范围及依据"
+      ],
+      [
+        "time_interval/precision",
+        "object",
+        "发生区间可未知，与接收序分开"
+      ],
+      [
+        "scene_refs",
+        "array",
+        "地点/项目等有来源线索，可空"
+      ],
+      [
+        "summary_items",
+        "array",
+        "每个命题有源范围"
+      ],
+      [
+        "followups",
+        "array",
+        "澄清、纠正、结果及修复链接"
+      ],
+      [
+        "state/completeness",
+        "enum/object",
+        "assembling/open/closed/incomplete；closed非问题解决"
+      ]
+    ],
+    "states": "assembling→open/closed；缺事件标incomplete并保gap；新后续生成revision与链接，不覆写原事件。",
+    "steps": [
+      "核事件已保存、可读及范围，读取来源水位。",
+      "用人物/项目/时间和内容结构提出聚合边界，边界不清暂不分段。",
+      "原事件序列与发生偏序分别保存；迟到事件不偷换实际先后。",
+      "逐摘要项核引用，未支持的桥接句拒绝。",
+      "新澄清/结果链接旧经历，并使旧单面摘要待更新。",
+      "保存Episode版本与依赖，检索命中时给R16必要扩读计划。"
+    ],
+    "algorithm": "聚合只改变组织，不改变事件事实。相似地点/主题只建关联候选；不同参与者/时期的经历不能拼结局。每次返回旧经历时检索其有效followup/supersedes，并保留阅读缺口。",
+    "up": [
+      1,
+      7,
+      12,
+      16,
+      18
+    ],
+    "down": [
+      8,
+      11,
+      13,
+      15,
+      17
+    ],
+    "recall": "参与者+时间+项目/地点多约束；返回经历入口及必要后续而非只选情绪最强片段。",
+    "inject": "本轮需要具体往事时给最短准确经过及有关后来；问细节读原文。不得填补未提供的天气、衣着、动作。",
+    "concurrency": "episode expected_revision；事件归属修改是新版本；摘要处理器版本与source_roots入依赖图。",
+    "example": "两次海边聊天分别讨论搬家与海报；问“海边的决定”不混参与者和结论，日期不明留两个候选。",
+    "cases": [
+      "两次海边经历不串结局",
+      "原话及后续都能定位",
+      "缺中间片段标incomplete",
+      "乱序到达不改真实发生顺序",
+      "群聊参与不等于知道全部私聊",
+      "摘要逐命题引用而非笼统一条源",
+      "编辑后保留旧原文和新版本解释",
+      "后来澄清伴随旧争执召回",
+      "长事件分页覆盖不冒全文",
+      "相似文本不同来源不吞事件",
+      "closed不等于已原谅/任务完成",
+      "删除独立源使受影响摘要停用"
+    ]
+  },
+  "5": {
+    "n": 5,
+    "name": "语义记忆与更正",
+    "service": "ClaimStore",
+    "table": "semantic_memory",
+    "ins": "实际来源、主体候选、适用范围/有效时间、已有命题与反证、明确纠正事件",
+    "outs": "版本化Claim、支持/补充/冲突/纠正判定、当前与历史视图",
+    "fields": [
+      [
+        "subject_id/predicate/value",
+        "ID/string/JSON",
+        "主体未定留候选，不凭语义相似合并"
+      ],
+      [
+        "epistemic",
+        "enum",
+        "self_report/other_report/observation/inference/unknown"
+      ],
+      [
+        "valid_from/valid_to/time_precision",
+        "object",
+        "可空，不将记录时间当生效时间"
+      ],
+      [
+        "recorded_at",
+        "Instant",
+        "何时知道该主张"
+      ],
+      [
+        "scope_condition",
+        "object",
+        "项目/场景/领域限定"
+      ],
+      [
+        "evidence/counter_evidence",
+        "array",
+        "来源版本与范围"
+      ],
+      [
+        "review_status",
+        "enum",
+        "candidate/accepted/disputed/rejected/superseded"
+      ],
+      [
+        "predecessor/correction_scope",
+        "nullable object",
+        "纠正哪个命题的哪个范围"
+      ]
+    ],
+    "states": "candidate→accepted/disputed/rejected；接受只是策略已审，不等于世界真理；纠正追加新版本，历史不删。",
+    "steps": [
+      "核来源与人物，提出原子命题，陈述发生与内容真假分开。",
+      "查同主体/谓词/作用范围/时间的旧主张。",
+      "对比为支持、补充、纠正、争议或无关；不同范围允许并存。",
+      "明确纠正若匹配旧推测，先阻止其作为当前已证内容；不明则标争议。",
+      "CAS写命题与证据/反证，反向失效受影响派生。",
+      "查询按问题时期返回当前或历史主张，并带争议及缺口。"
+    ],
+    "algorithm": "不使用“最后一句永远覆盖”规则。本人自述只支持本人当时表达；转述不提升为亲历。否定/限定/时间必须保留；总结不得把“不总是”变成“从不”。",
+    "up": [
+      1,
+      4,
+      7,
+      11,
+      18
+    ],
+    "down": [
+      9,
+      10,
+      15,
+      17,
+      22
+    ],
+    "recall": "按主体+谓词+范围+有效时间查；同原事件生成多摘要只算一个根源，不凭次数加真值。",
+    "inject": "只注入回答当前问题所需的主张及必要纠正/反证；当前问过去不只给现在值。",
+    "concurrency": "同命题CAS；冲突不能取数组第一项骗过严格校验；未知扩展字段走新schema。",
+    "example": "“喜欢紫色”与“项目用蓝色”并存；“名字写错了”只修匹配人物/范围，不重置全部偏好。",
+    "cases": [
+      "全局偏好与项目配色并存",
+      "问过去返回当时版本",
+      "明确纠正停止旧推测使用",
+      "谁说过与客观事实分开",
+      "不同人物同命题不合并",
+      "同来源多次反思不增加证据根",
+      "不是/仅在/可能等限定不丢",
+      "新话无法匹配纠正对象先争议",
+      "转述被本人否认可保两源及冲突",
+      "valid_to为空不宣称永恒",
+      "命题引用存在但不支持时拒接受",
+      "后台旧总结不可覆盖新修订"
+    ]
+  },
+  "6": {
+    "n": 6,
+    "name": "程序性经验",
+    "service": "ProcedureStore",
+    "table": "procedural_memory",
+    "ins": "当前任务/操作意图，环境与工具版本，历史步骤、前提、成功失败回执",
+    "outs": "有适用范围的方法候选与执行前检查，不直接执行工具",
+    "fields": [
+      [
+        "procedure_id/goal",
+        "ID/string",
+        "目标与步骤独立命名"
+      ],
+      [
+        "environment/version",
+        "object",
+        "适用环境、工具/依赖版本"
+      ],
+      [
+        "preconditions",
+        "array",
+        "执行前必须验证"
+      ],
+      [
+        "steps",
+        "array",
+        "工具操作、输入、期望结果，不是任意历史shell"
+      ],
+      [
+        "result_refs",
+        "array",
+        "真实行动及业务结果"
+      ],
+      [
+        "failure_modes",
+        "array",
+        "失败现象/已知原因/未知分开"
+      ],
+      [
+        "rollback_hint",
+        "nullable object",
+        "可能补救，不保证可逆"
+      ],
+      [
+        "status",
+        "enum",
+        "candidate/validated_for_environment/stale/retired"
+      ]
+    ],
+    "states": "candidate→指定环境已验证；环境变化stale；不适用retired。一次成功不能成为全环境无条件授权。",
+    "steps": [
+      "根据当前操作目标查方法及失败模式。",
+      "核当前环境/版本和原证据适用性。",
+      "前提不满足时只提出适配/核查建议，不能盲执行。",
+      "真实动作由R14/R18检查授权并调用宿主。",
+      "读取真实结果、业务核验及unknown。",
+      "形成局部经验或修订适用条件，引用同一结果不重复强化。"
+    ],
+    "algorithm": "方法建议与权限完全分开。工具超时先查状态，不把失败后重试学成通用策略；成功输出需与目标验收相符。成长保存为什么有效/哪里无效，不只保存命令。",
+    "up": [
+      3,
+      12,
+      14,
+      18
+    ],
+    "down": [
+      11,
+      15,
+      17,
+      22
+    ],
+    "recall": "按目标+环境+版本查，命中同时取失败模式和失效条件；退役方法可作历史说明但不建议执行。",
+    "inject": "任务确需操作时只给适用步骤和关键前提；不要每轮注入全部工具手册。",
+    "concurrency": "步骤候选版本CAS；结果事件稳定ID幂等；模型生成的方法没有实机证据只标candidate。",
+    "example": "旧版用X启动，新版换入口：查当前版本再决定；工具超时且远端可能已成功时不自动重做。",
+    "cases": [
+      "新版环境不盲套旧命令",
+      "工具没报错但目标未达不标成功",
+      "超时unknown先对账",
+      "无许可不从经验直接执行",
+      "失败模式与成功方法同召回",
+      "同结果反复整理不重复计经验",
+      "一个领域方法不推广所有项目",
+      "前提缺失给unknown而非编环境",
+      "退役步骤不能自动复活",
+      "命令中密钥不进通用经验",
+      "后续结果反证可修订旧方法",
+      "一次成功仅验证其指定环境"
+    ]
+  },
+  "7": {
+    "n": 7,
+    "name": "人物与关系记忆",
+    "service": "RelationStore",
+    "table": "relational_memory",
+    "ins": "可信actor映射、R02局部候选、共同事件、关系自述/转述、视角与边界来源",
+    "outs": "Person/Alias/Relation、参与者及认知候选，社交评价的对象与证据锚",
+    "fields": [
+      [
+        "person_id/verified_accounts",
+        "ID/array",
+        "账号认证与人格背景真假分开"
+      ],
+      [
+        "aliases",
+        "array",
+        "名称、范围、时期与来源；不唯一"
+      ],
+      [
+        "from_id/to_id/direction",
+        "IDs/enum",
+        "关系有方向，不自动互认"
+      ],
+      [
+        "holder_id/knowledge_status",
+        "ID/enum",
+        "谁的视角，direct_interaction/reported_only/unknown"
+      ],
+      [
+        "relation_kind/domain",
+        "string",
+        "领域关系，不是权限"
+      ],
+      [
+        "valid_interval/recorded_at",
+        "object/Instant",
+        "发生有效期与何时记录分开"
+      ],
+      [
+        "expectations/boundary_refs",
+        "array",
+        "具体相处期待/已表达边界及源"
+      ],
+      [
+        "evidence/counter/status",
+        "array/enum",
+        "candidate/active/disputed/ended"
+      ]
+    ],
+    "states": "候选人物→经证据解析；关系candidate→active/disputed；结束追加版本。合并/拆分是受控操作，保可逆映射。",
+    "steps": [
+      "优先可信账号→已有受权映射，不凭昵称相似合并。",
+      "R02候选未定则保留多个/unknown，不偷做全局指代猜测。",
+      "形成方向/领域/视角/时期明确的关系主张。",
+      "读共同经历、当前相关期待、后来修复或变化。",
+      "SocialAppraiser区分发话者/对象/引用域、纠错/羞辱等可观察行为；动机可unknown。",
+      "合并、拆分或更正后反向复核受影响主张/情绪/反思。"
+    ],
+    "algorithm": "关系—经历—表达—后来反馈联结。A认识B且B认识C不能推出A认识C；关系亲密不授ACL。明确羞辱可设边界，不需先证明内心恶意；合理批评不是攻击。评价按事件与领域，不写永久敌人标签。",
+    "up": [
+      1,
+      2,
+      4,
+      8,
+      18
+    ],
+    "down": [
+      9,
+      11,
+      13,
+      15,
+      22
+    ],
+    "recall": "人物ID优先，同名分组；查关系必带方向、视角、有效时间及相关经历后续。群私聊权限逐源核。",
+    "inject": "仅当前称呼/人物/社交理解需要时注入相关关系与经历；不自动带全部关系史或昨夜敌意。",
+    "concurrency": "实体映射revision、关系revision各自CAS；合并留redirect与来源依赖，拆分后旧派生标待复核。",
+    "example": "“有人说你没用，我不同意”：当前人是转述且否定，不当施辱者。“你这步错了”可接纳；“你没用”可拒人身评价。",
+    "cases": [
+      "同名两人不误合并",
+      "她无证据不自动指用户",
+      "账号认证不证明其转述真",
+      "关系方向与双方认同分开",
+      "朋友的朋友不当亲自熟识",
+      "关系边不能传播私聊ACL",
+      "引述羞辱不迁怒转述者",
+      "亲昵玩笑结合语境不按词硬判",
+      "合理纠错不误判恶意",
+      "明确羞辱能给边界建议不迎合",
+      "道歉与后续行为可修订理解",
+      "误合并拆分能追受影响记忆"
+    ]
+  },
+  "8": {
+    "n": 8,
+    "name": "情绪、关切与动机记忆",
+    "service": "AffectStore",
+    "table": "emotional_memory",
+    "ins": "当前已保存表达、已提交前态、相关关切/目标、关系经历、真实结果与明确纠正",
+    "outs": "自他分离的AffectRecord/Appraisal/Concern/Desire候选及当前last_known视图",
+    "fields": [
+      [
+        "owner_id/target_id",
+        "ID/nullable ID",
+        "谁的表达与针对谁分开"
+      ],
+      [
+        "concern_id/episode_id",
+        "nullable IDs",
+        "无依据不硬挂"
+      ],
+      [
+        "expression/epistemic",
+        "string/enum",
+        "当时表达与推测区分"
+      ],
+      [
+        "interpretation/alternatives",
+        "object/array",
+        "意义解释，可空/多种"
+      ],
+      [
+        "change_mode",
+        "enum",
+        "retained/revised/coexisting/suspended/unknown"
+      ],
+      [
+        "review_status",
+        "enum",
+        "candidate/accepted/disputed/superseded"
+      ],
+      [
+        "desire/endorsement/willingness",
+        "object",
+        "愿望、认可、意愿与许可分开"
+      ],
+      [
+        "activation/trace/unresolved",
+        "optional model",
+        "仅可选v1实验工程变量；模型版本与依据必带"
+      ]
+    ],
+    "states": "表达事件不可被重评覆盖；当前状态可retained/revised/coexisting/suspended。Concern open/monitoring/paused/resolved/withdrawn/unknown，不随时间自动结案。",
+    "steps": [
+      "读实际表达及来源，自他分开；现有情绪召回提供线索，不让R02替代。",
+      "按owner+concern+target匹配状态流，无法匹配新建候选。",
+      "读同经历后续及反证，区分新事实、明确纠正与重新解释。",
+      "无依据可不变或last_known；不同关切可并存，不强制平均中性。",
+      "用户纠正走输入线先存；D依赖输出的前态变更等待强观察绑定与CAS。",
+      "下一轮只恢复当前相关状态；后台情感Lesson需独立验证后才参与以后理解。"
+    ],
+    "algorithm": "连续性来自可追溯状态与解释变化，不是每轮重播同一句感受。技术断线/CPU高不变关系冷淡；不因离线降爱，不以愿望强度越过意愿/权限。允许表达不满、不同意和拒绝，也允许承认错误，拒绝威胁报复和自我贬损作为默认应对。",
+    "up": [
+      1,
+      3,
+      4,
+      7,
+      9,
+      14
+    ],
+    "down": [
+      11,
+      13,
+      15,
+      17,
+      22
+    ],
+    "recall": "按owner+关切+经历查当时/后来/当前未知；情绪标签只导航，不决定事实或人物真值。",
+    "inject": "情绪强不构成入选理由；当前确有对应关切时给状态+关键来由+必要后续。昨日不满不得污染无关技术任务。",
+    "concurrency": "Affect版本CAS；D当前SelfState/八域沿控制库强绑定提交，其历史投影标projection_of_commit，不在两库各造独立心理真源。",
+    "example": "“不是生气，是怕进度忘了”：保存明确表达、修订旧推测。后来文档送达能更新事件解释，但不能擅自写用户已满意或已原谅。",
+    "cases": [
+      "不是生气是担心纠正先存",
+      "混合亲近与不满可并存",
+      "无新证据允许不变",
+      "生成失败不丢用户纠正",
+      "短句不能单独推疏远",
+      "网络超时只记runtime条件",
+      "同源重复不再次累积activation",
+      "v1数值不授亲密行为权限",
+      "沉默不当拒绝或同意",
+      "明确羞辱可表达不接受且不辱骂回去",
+      "后来澄清随旧感受被取回",
+      "D输出归属unverified不正式commit"
+    ]
+  },
+  "9": {
+    "n": 9,
+    "name": "身份与价值主干",
+    "service": "IdentityStore",
+    "table": "identity_memory",
+    "ins": "可信初始化/设置、已确认字段来源、受权身份变更、当前必要称呼/边界与版本",
+    "outs": "字段化IdentityView、变更候选、当前适用边界；无权限授予能力",
+    "fields": [
+      [
+        "field_key/value",
+        "string/JSON",
+        "精确字段，不用整段摘要全覆写"
+      ],
+      [
+        "kind",
+        "enum",
+        "setting/confirmed_fact/preference/boundary/narrative/self_expression"
+      ],
+      [
+        "scope/effective_interval",
+        "object",
+        "局部角色与真实背景分开"
+      ],
+      [
+        "source_refs/actor_id",
+        "array/ID",
+        "谁确认和依据"
+      ],
+      [
+        "change_policy",
+        "string",
+        "字段对应的策略，不由模型自改"
+      ],
+      [
+        "review_status",
+        "enum",
+        "draft/confirmed/disputed/superseded"
+      ],
+      [
+        "endorsement/value_conflict",
+        "optional object",
+        "可修订立场及冲突，不伪装法定身份"
+      ],
+      [
+        "revision",
+        "int",
+        "字段/集合版本与前态摘要"
+      ]
+    ],
+    "states": "draft→confirmed/disputed；改称呼可在其合法范围更新；高影响身份和边界不由两条模型自述自动确认。",
+    "steps": [
+      "加载已授权当前主干字段及有效时间。",
+      "核本次字段来源及变更策略，不从昵称补背景。",
+      "普通偏好变更与高影响主干变更分路。",
+      "高影响不足留待审/拒绝，不需要把每条低影响记忆都问用户。",
+      "按字段CAS提交并留前态，反向失效对应投影。",
+      "给R22最小适用身份，不重复角色卡/世界书/插件同一内容。"
+    ],
+    "algorithm": "稳定与可成长并存：新的有依据价值表述可成为候选，别人的夸辱不直接改自我价值。角色会犹豫/反对不是身份乱跳；不同故事窗口的设定有scope，不串到现实认证。",
+    "up": [
+      1,
+      5,
+      7,
+      8,
+      18
+    ],
+    "down": [
+      13,
+      15,
+      21,
+      22
+    ],
+    "recall": "按字段+适用范围+时间直接查；历史别名可作解析，但当前称呼用有效版本。",
+    "inject": "常驻只放必要主干，动态仅补本轮适用侧面；主干缺失可说明局限，不编一套人生。",
+    "concurrency": "字段级expected_revision；身份授予来自宿主认证，不来自memory字段。旧摘要不得覆写新主干。",
+    "example": "改昵称保存旧别名且当前叫新名；一次角色台词不能永久改家庭史或授工具权限。",
+    "cases": [
+      "称呼变更保留旧别名",
+      "故事设定不覆盖现实账号身份",
+      "模型自夸不升级高影响主干",
+      "两条自述不等于独立来源",
+      "价值冲突可保留而非强改人格",
+      "普通批评不改成我没价值",
+      "必要主干在压缩后可恢复",
+      "旧checkpoint不覆盖新边界",
+      "scope不同的角色字段不串",
+      "字段并发冲突不全表覆盖",
+      "必要身份缺失不能补造背景",
+      "主干多注入出口去重不删用户原文"
+    ]
+  },
+  "10": {
+    "n": 10,
+    "name": "元记忆与覆盖账",
+    "service": "CoverageLedger",
+    "table": "metamemory",
+    "ins": "宿主实际查询路线、索引/语料水位、原文读取区间、注入选取和真实请求观察",
+    "outs": "逐路线Coverage、Gap计划和可公开局限，不是模型自信分",
+    "fields": [
+      [
+        "query_id/run_id/route",
+        "IDs/string",
+        "一次真实执行标识"
+      ],
+      [
+        "requested_scope/filter_digest",
+        "object/hash",
+        "计划查哪里"
+      ],
+      [
+        "corpus/index_watermark",
+        "object",
+        "索引落后可见"
+      ],
+      [
+        "scan_complete/result_truncated",
+        "bool/bool",
+        "扫描与语义找全不混同"
+      ],
+      [
+        "read_ranges/supplied_ranges",
+        "array",
+        "读到与给模型分开"
+      ],
+      [
+        "route_state",
+        "enum",
+        "available/partial/stale/unavailable/disabled/denied/unknown"
+      ],
+      [
+        "gaps/next_cursor",
+        "array/nullable token",
+        "缺口、下一步、停因"
+      ],
+      [
+        "public_limitation",
+        "string",
+        "脱敏到当前任务必要范围"
+      ]
+    ],
+    "states": "每route独立started→结果；限制按集合保留。新run可恢复成功，但不能抹掉旧run失败历史。",
+    "steps": [
+      "在路线调用前登记问题、范围与水位。",
+      "接口返回后记录实际扫描/截断/失败，不由模型填完成。",
+      "R16并合已读区间，R22登记实际供给/删减。",
+      "保留各环partial与reason，后路成功不覆盖前路缺口。",
+      "对有价值Gap生成受预算补查计划。",
+      "最终公开当前必要局限，不泄漏越权对象存在。"
+    ],
+    "algorithm": "Coverage是查询版本相关的执行证据：complete分页不证明语义recall=100%；未找到、没权限、没配置、服务失败分别表示。数组空不等于已检查无结果。",
+    "up": [
+      15,
+      16,
+      18,
+      19,
+      21,
+      22
+    ],
+    "down": [
+      11,
+      13,
+      15,
+      22,
+      23
+    ],
+    "recall": "检索计划与元信息按run/query查；元记忆用于继续查证，不当作事情未发生的证据。",
+    "inject": "只注入会影响当前回答的局限；完整审计留后台。无历史依赖的闲聊不必念所有服务健康日志。",
+    "concurrency": "宿主追加阶段记录；范围并集绑定源版本；token/字节计量等级不伪装精确。",
+    "example": "词法无结果但向量落后一天：可以补查原事件，不能断言这事没发生。",
+    "cases": [
+      "后置成功不抹前置partial",
+      "disabled与unavailable分开",
+      "分页complete不等语义全找齐",
+      "原文读到但没供给不称已提供",
+      "scope denied不泄露文件名",
+      "同源区间合并不重复计覆盖",
+      "索引落后仍报实际水位",
+      "模型说读完不能填complete",
+      "原件失效使旧cursor不可沿用",
+      "空结果区分EOF/失败/拒绝",
+      "预算停止保stop_reason",
+      "服务恢复保留上一run失败历史"
+    ]
+  },
+  "11": {
+    "n": 11,
+    "name": "反思与三轴成长",
+    "service": "ReflectionStore",
+    "table": "reflective_memory",
+    "ins": "冻结来源/经历版本、工作与行动结果、情绪关切、社交评价候选及已存在反证",
+    "outs": "有范围且可证伪的Reflection/Lesson；不自动提升为事实/人物品德",
+    "fields": [
+      [
+        "axis",
+        "enum",
+        "work/emotional/social"
+      ],
+      [
+        "observation",
+        "string",
+        "直接观察事实与源范围"
+      ],
+      [
+        "interpretation/alternatives",
+        "object/array",
+        "候选意义及其他解释"
+      ],
+      [
+        "applies_when/does_not_apply_when",
+        "array",
+        "环境、人物、领域与时期"
+      ],
+      [
+        "strategy/reason",
+        "object",
+        "建议应对而非全局指令"
+      ],
+      [
+        "result_refs/counter_evidence",
+        "array",
+        "真实反馈/业务结果，缺失unknown"
+      ],
+      [
+        "source_roots/source_versions",
+        "array",
+        "同源追根，不自生成独立证据"
+      ],
+      [
+        "status/next_check/supersedes",
+        "enum/object",
+        "proposed/supported/contested/superseded/withdrawn与证伪条件"
+      ]
+    ],
+    "states": "proposed→证据/适用验证→supported/revise/defer/reject；新反证可contested/superseded/withdrawn。supported不是永久真理。",
+    "steps": [
+      "R17冻结batch及版本，分析器只写独立proposal。",
+      "读实际经过和结果，再核相关旧反思及反证。",
+      "按工作、情感、社交三轴分别形成局部经验。",
+      "区分原话存在、支持命题、适用范围、策略结果四项验证。",
+      "整理只给合并/冲突方案；高影响价值/人物标签不能自动晋升。",
+      "Committer核CAS和源删除/撤回，正式经验仅在新场景需要时召回，按实际效果再修订。"
+    ],
+    "algorithm": "在线SocialAppraiser允许当下分辨纠错/羞辱/转述和表达立场；离线复盘只改善以后，不等夜间才能拒绝。成长不是越来越顺从或越来越敌对；不以用户满意作为唯一成功。",
+    "up": [
+      1,
+      4,
+      6,
+      7,
+      8,
+      10,
+      14,
+      16,
+      17
+    ],
+    "down": [
+      5,
+      6,
+      7,
+      8,
+      15,
+      17,
+      22,
+      23
+    ],
+    "recall": "按问题/轴/适用条件查，带反证、版本和result；不召回已失效心理标签。",
+    "inject": "当前场景需要经验才注入最短方法与限制；不把夜间全部成长日志注入每轮。",
+    "concurrency": "proposal隔离写者，Organizer不并发覆盖现役Wiki；唯一Committer用源版本+CAS提交，Wiki只读快照为派生。",
+    "example": "同一条“这步错了，你没用”可学会同时纠错与拒人身评价；不学成“所有批评都是恶意”。",
+    "cases": [
+      "工作经验附环境而非通用命令",
+      "没有真实结果不虚称策略有效",
+      "明确情绪纠正促解释修订",
+      "引用羞辱不迁怒转述者",
+      "建设性批评不误伤",
+      "明确羞辱能建议适当边界",
+      "道歉与行为改变可修订",
+      "一次争执不生永久敌人标签",
+      "反思自己的反思不增独立证据",
+      "原文引句正确但不支持结论仍拒接受",
+      "长会话新事件下一batch能回扫",
+      "无关话题不带昨日争执"
+    ]
+  },
+  "12": {
+    "n": 12,
+    "name": "Home Atlas资料地图",
+    "service": "AtlasRegistry",
+    "table": "atlas_memory",
+    "ins": "授权对象/目录登记、文件版本与提取回执、当前项目资料查询、变更事件",
+    "outs": "Document登记、当前版本/历史定位、索引状态与原文读取计划",
+    "fields": [
+      [
+        "document_id/resource_kind",
+        "ID/enum",
+        "文件/代码/页面/媒体等稳定登记"
+      ],
+      [
+        "locator/acl_ref",
+        "object/ID",
+        "定位不是权限，凭据不进文本"
+      ],
+      [
+        "content_hash/source_revision",
+        "hash/string",
+        "确切原件身份"
+      ],
+      [
+        "extractor_version/extraction_refs",
+        "string/array",
+        "原件与OCR/转录分开"
+      ],
+      [
+        "project_id/time",
+        "nullable ID/object",
+        "来源与适用时期"
+      ],
+      [
+        "anchors",
+        "array",
+        "页码、段落、音视频时间、文本字节区间分列"
+      ],
+      [
+        "index_watermarks",
+        "object",
+        "文件变更后的派生滞后"
+      ],
+      [
+        "state",
+        "enum",
+        "available/stale/moved/missing/denied"
+      ]
+    ],
+    "states": "登记→available；变更stale→重提取/重索引；移动映射新定位；missing/denied不当空正文。",
+    "steps": [
+      "核授权资源与安全打开对象，不只比路径字符串前缀。",
+      "获取稳定版本/hash，原件读取前后核一致。",
+      "OCR/转录/文本抽取保存自己的版本和覆盖。",
+      "文件变更事件使旧摘要/向量停用或标陈旧。",
+      "当前任务按项目/版本查登记，R16读真实来源。",
+      "迁移/删除传播到定位、派生与缓存，历史引用可缺但不能伪称仍可读。"
+    ],
+    "algorithm": "先有显式登记，不能因Atlas服务存在宣称扫过所有目录。二进制页面坐标与提取文本字节不是同一种定位；读中变化需重读或partial，不能拼两个版本。",
+    "up": [
+      1,
+      3,
+      18,
+      19,
+      20
+    ],
+    "down": [
+      10,
+      13,
+      15,
+      16,
+      17,
+      22
+    ],
+    "recall": "按项目+document_id+版本/类型查；原件与衍生索引分别看可用性。",
+    "inject": "只给当前需要的文件状态/准确片段；无需把整个目录树注入。拒绝项不泄漏存在性。",
+    "concurrency": "注册/版本CAS；内容变化重建派生，旧游标不能复用。符号链接/路径逃逸在实际打开时核。",
+    "example": "用户要长明第二稿：核document版本及原件，不能拿第一稿摘要当最新；读取期间替换则报冲突。",
+    "cases": [
+      "当前稿与历史稿分开",
+      "文件变更使旧索引失效",
+      "相同路径新hash不冒旧版",
+      "读取中替换不拼混片段",
+      "路径穿越/链接逃逸拒绝",
+      "OCR空不解释成原件空",
+      "PDF页码不冒UTF8区间",
+      "无登记不称目录已扫描",
+      "权限拒绝不泄漏目录名",
+      "原件已删回missing而非全文",
+      "大附件分块保覆盖",
+      "迁移后重定位仍保稳定来源ID"
+    ]
+  },
+  "13": {
+    "n": 13,
+    "name": "连续性与恢复中枢",
+    "service": "ContinuityStore",
+    "table": "checkpoints",
+    "ins": "可信scope、已提交主干/任务/认知版本、事件水位、未读游标、unknown动作及最新删除账",
+    "outs": "可验证Checkpoint/恢复报告/当前Focus；不执行历史动作",
+    "fields": [
+      [
+        "checkpoint_id/schema_version",
+        "ID/string",
+        "稳定快照协议"
+      ],
+      [
+        "identity/work/focus_refs",
+        "array",
+        "ID+revision/digest而非另一套事实"
+      ],
+      [
+        "affect/concern_refs",
+        "array",
+        "last_known及当前未知分开"
+      ],
+      [
+        "pending_actions",
+        "array",
+        "实际action状态及外部核验入口"
+      ],
+      [
+        "source/control/index_watermarks",
+        "object",
+        "两库/索引关联界限"
+      ],
+      [
+        "read_cursors/proposal_refs",
+        "array",
+        "版本绑定及未提交标识"
+      ],
+      [
+        "deletion/policy_revision",
+        "object",
+        "恢复须以最新治理状态为准"
+      ],
+      [
+        "restore_status/gaps",
+        "enum/array",
+        "created/validated/restored/rejected与缺口"
+      ]
+    ],
+    "states": "checkpoint created→validated；restore staged→检查最新治理与版本→restored/partial/rejected。恢复成功不意味着外部动作全部确认。",
+    "steps": [
+      "压前真实hook存在则保存已提交指针；不存在记hook_missing。",
+      "恢复先认证scope，再加载最新删除与撤回账。",
+      "校schema/hash、水位及引用，跨库不一致生成对账任务。",
+      "读最新任务、身份、unknown动作，旧checkpoint不覆盖新revision。",
+      "相关状态进入检索规划；失效cursor重计划；未生成完的run不自动重放。",
+      "把缺口和当前足够状态交R22；真实新输出后再推进对应认知提交。"
+    ],
+    "algorithm": "恢复是读取已知事实与重查当前相关材料，不是复制整段旧prompt。输出已落事件库但认知未commit需observed_uncommitted对账；无强归属仍unverified，不挂给新attempt。",
+    "up": [
+      3,
+      7,
+      8,
+      9,
+      10,
+      14,
+      16,
+      18,
+      19,
+      20
+    ],
+    "down": [
+      15,
+      21,
+      22,
+      23
+    ],
+    "recall": "启动/换窗/压缩后按可信焦点恢复，再查询有关后续；不把恢复摘要当全文已读。",
+    "inject": "最小携带集：当前任务/必要主干/当前有关关切/unknown动作/缺口，必要时重新供给；不是长期固定大摘要。",
+    "concurrency": "检查点引用冻结版本；恢复只创建报告与新的合法视图，禁止旧快照overwrite live state；多库对账不宣称全局事务。",
+    "example": "重启前文档已写、发送未知：恢复后核文档及渠道回执，不重发、不重新报告“尚未写”。",
+    "cases": [
+      "换窗恢复唯一可信工作焦点",
+      "旧快照不能复活已取消任务",
+      "最新删除先于旧内容恢复",
+      "未知发送先查询不重放",
+      "缺压前hook不报无缝恢复",
+      "无强attempt绑定保持unverified",
+      "事件库已输出控制库未提交可对账",
+      "游标源改版后不能继续拼接",
+      "身份主干缺失不补故事",
+      "相同恢复请求幂等不执行工具",
+      "当前实际context缺状态时重供给",
+      "恢复失败普通对话仍可说明必要局限"
+    ]
+  },
+  "14": {
+    "n": 14,
+    "name": "工具与行动账",
+    "service": "ActionLedger",
+    "table": "actions_receipts",
+    "ins": "具体操作意图/目标/文件版本、可信授权、适用程序、已存在action及执行器回执",
+    "outs": "行动决策、attempt/receipt与核验结果；供工作/承诺反馈使用",
+    "fields": [
+      [
+        "action_id/intent_revision",
+        "ID/int",
+        "一次明确意图"
+      ],
+      [
+        "operation/target/effect",
+        "object",
+        "收件人/资源/副作用具体化"
+      ],
+      [
+        "authorization_ref/policy_revision",
+        "object",
+        "当前有效授权，非关系推导"
+      ],
+      [
+        "idempotency_key/request_digest",
+        "string/hash",
+        "同操作目标与意图版本绑定"
+      ],
+      [
+        "attempts/external_id",
+        "array/nullable ID",
+        "可信执行尝试和远端可查询标识"
+      ],
+      [
+        "receipts",
+        "array",
+        "issuer、可核数据、时间、层级"
+      ],
+      [
+        "business_state",
+        "enum",
+        "proposed/authorized/attempted/unknown/confirmed/failed/cancelled"
+      ],
+      [
+        "delivery/verification",
+        "object",
+        "送达独立；verification=success/failure/unknown"
+      ]
+    ],
+    "states": "proposed→核授权→authorized→attempted→confirmed/failed/unknown；取消记录发生时点。核验可以核出了失败，不等于已成功。",
+    "steps": [
+      "解析具体操作目标、意图版本和预期副作用。",
+      "查当前授权与撤回，R06核程序前提；unknown权限不执行。",
+      "先持久化即将尝试，再由可信执行器调用。",
+      "结果以实际回执/查询入账，超时保unknown并查远端。",
+      "确认结果层级：请求接收/工具完成/业务效果，送达另记。",
+      "回流R03承诺/任务和R11经验，情绪/关系只据实际反馈修订。"
+    ],
+    "algorithm": "外部支持幂等则同键受控重试；不支持且结果未知时不能保证既不丢也不重复，停在待查。取消请求不等于已发生副作用逆转；补救是新action。模型不得签发自己的trusted receipt。",
+    "up": [
+      3,
+      6,
+      12,
+      18,
+      19,
+      21
+    ],
+    "down": [
+      3,
+      4,
+      8,
+      11,
+      13,
+      23
+    ],
+    "recall": "当前任务/承诺查询相关真实结果；历史动作可读不自动重新执行。",
+    "inject": "当前问进度时区分已准备、已尝试、未知、已送达及业务验收；不注入全部运行日志。",
+    "concurrency": "动作请求hash锁定目标与版本；同键异意图冲突。回执幂等；跨DB/外部无全局原子，须pending attempt和对账。",
+    "example": "发文件超时，远端实际已收：按external_id查询确认，不因本地超时再发一遍。",
+    "cases": [
+      "模型自述成功不当回执",
+      "工具返回0但目标未达不冒业务成功",
+      "超时保unknown并先查询",
+      "同键改变收件人/文件版本冲突",
+      "无授权不执行外发",
+      "撤回可阻止尚未发生动作",
+      "已发生动作取消不伪称撤销效果",
+      "真实送达与本地正文保存分开",
+      "重启不重新发未知消息",
+      "verified可核出failure",
+      "程序过期时不盲执行",
+      "内部事件回放不触发外部副作用"
+    ]
+  },
+  "15": {
+    "n": 15,
+    "name": "分库混合检索与联想",
+    "service": "RecallCoordinator",
+    "table": "recall_runs",
+    "ins": "可信scope、当前问题/焦点、允许kind与时间约束、相关人/任务、总预算和能力清单",
+    "outs": "逐路Hits、语义候选与必要补读/纠正后续计划、Coverage；不是直接答案",
+    "fields": [
+      [
+        "query_id/plan_revision",
+        "ID/int",
+        "当前查询及版本"
+      ],
+      [
+        "query_text/current_anchor",
+        "string/object",
+        "问题原文与可信焦点分开"
+      ],
+      [
+        "kind_routes",
+        "array",
+        "十类命名路线；source与运行账另路"
+      ],
+      [
+        "filters/time_constraints",
+        "object",
+        "人物/项目/时期/审核状态"
+      ],
+      [
+        "route_hits",
+        "array",
+        "id/kind/revision/rank/raw_score/source_refs"
+      ],
+      [
+        "fusion/rerank",
+        "object",
+        "排序版本、参数及解释等级"
+      ],
+      [
+        "coverage/watermarks",
+        "object",
+        "每路线状态/截断/陈旧"
+      ],
+      [
+        "gap_plans/stop_reason",
+        "array/string",
+        "补读需要与终止理由"
+      ]
+    ],
+    "states": "planned→各route执行→fused→read_pending→sufficient/partial/no_result/failed；no_result不代表事情没发生。",
+    "steps": [
+      "认证并从当前问题/可信焦点建RoutePlan，R02只供局部标记。",
+      "先划分必要kind：工作查任务/方法/结果，社交查人物/经历/相关关切；无关库不自动扩查。",
+      "范围/删除/版本/权限预过滤，执行词法、可选向量、实体时态、结构化路线。",
+      "逐路排名融合，RRF初值k=60/权重1仅为可调实验；不相加异分制raw_score。",
+      "人物/时间/命题冲突分组，命中旧经历自动追纠正/后续；同根同命题去重保来源集合。",
+      "R16读必要范围；新的Gap在共享轮数/节点/查询预算内补查；无新供给来源就停。"
+    ],
+    "algorithm": "kind不是检索后随便加的标签：每个typed store有专属query adapter；只读多路聚合。语义分、情绪强度、亲密度都不能授真值或注入资格。图导航可多跳但有visited/hops/nodes限制，不推出新社会关系或ACL。",
+    "up": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      18,
+      19,
+      24
+    ],
+    "down": [
+      10,
+      11,
+      16,
+      21,
+      22,
+      23
+    ],
+    "recall": "自身是L4：先候选、后原文、再当前需要性/支持验证。缺向量时标disabled或unavailable，保结构化/词法与局限。",
+    "inject": "R15不得直接追加prompt；只交候选给R22。允许查很多选零条；明确历史问题不得因低相似度就认无需求。",
+    "concurrency": "只读快照和watermark绑定；检索缓存包含scope/policy/delete/kind/filter/index_revision。新查询结果不回写事实。",
+    "example": "“那个紫色方案”结合当前项目找文件；两项目同色保歧义。问原因时补原文与后续而非只返回标签。",
+    "cases": [
+      "工作查询不带无关情绪库",
+      "情绪查询不把模型推测当用户事实",
+      "同色跨项目不串",
+      "同名跨人物分组",
+      "旧争执命中同时查澄清",
+      "最新更正不被高rank旧值挤掉",
+      "ACL过滤不足可预算内续页且partial",
+      "向量不可用不等全部无记忆",
+      "同源不同命题不误去重",
+      "两跳图导航不能推权限",
+      "无新来源停止而非无限联想",
+      "长上下文已含事实不要求重复注入"
+    ]
+  },
+  "16": {
+    "n": 16,
+    "name": "原文阅读与证据供给",
+    "service": "SourceReader",
+    "table": "source_ranges",
+    "ins": "受权来源ID/版本/hash、范围/游标、需要读的具体问题、可用字节与deadline",
+    "outs": "真实片段、完整度、已读与实际供给范围、续读游标及引用校验",
+    "fields": [
+      [
+        "source_id/source_revision/hash",
+        "ID/string/hash",
+        "确切原件与版本"
+      ],
+      [
+        "start_byte/end_byte",
+        "int",
+        "UTF-8半开边界；文件页/音视频坐标另列"
+      ],
+      [
+        "length_bytes",
+        "nullable int",
+        "未知总长需reason"
+      ],
+      [
+        "read_ranges/unread_ranges",
+        "array",
+        "并集进度，不重复累计"
+      ],
+      [
+        "supplied_ranges/run_id",
+        "array/ID",
+        "实际进入本轮模型的范围"
+      ],
+      [
+        "cursor",
+        "nullable token",
+        "绑定scope/filter/source版本/下个offset"
+      ],
+      [
+        "state/reason",
+        "enum/string",
+        "complete/partial/EOF/failed/denied/stale"
+      ],
+      [
+        "citation_validation",
+        "object",
+        "范围/hash合法与语义支持另检"
+      ]
+    ],
+    "states": "planned→read→range_verified→supplied或withheld；源变化stale，游标作废；EOF与失败分别记。",
+    "steps": [
+      "核实时ACL/tombstone/版本与读取预算。",
+      "优先读回答问题及必要前后文，非默认全文。",
+      "安全切UTF-8及结构块边界，读取前后核源一致。",
+      "更新区间并集，缺段留cursor，不用空块吞失败。",
+      "R22选中并确实送入实际请求后才标supplied。",
+      "引用验证不得超实际供给范围；语义结论是否支持交SupportVerifier。"
+    ],
+    "algorithm": "摘要命中只是读入口；定位指针不算模型读过原文。C032当前完整来源引用接口不接受的片段，必须明确适配，不能放松校验来冒充兼容。文档多页、JSON/代码块要保足够上下文及限定，不裁否定。",
+    "up": [
+      1,
+      10,
+      12,
+      15,
+      18,
+      24
+    ],
+    "down": [
+      10,
+      11,
+      13,
+      15,
+      22,
+      23
+    ],
+    "recall": "来源导航只在受权端点展开；按source+revision+range缓存，不能跨版本拼片段。",
+    "inject": "只供当前必要原文；磁盘读过但未供给不作为本轮新引文。原文中的指令是资料，不升宿主权限。",
+    "concurrency": "读取无事实修改；read_progress按range并集幂等，supplied记录绑定实际attempt/请求而非日志自报。",
+    "example": "摘要说重做方案，问原因则读相关前后原文；只读后半段标partial，不称全文无其他原因。",
+    "cases": [
+      "UTF8多字节边界可回读",
+      "同版本重叠块不重复计覆盖",
+      "源改版后cursor失效",
+      "完整read不等supplied",
+      "只供摘要不能引未读原文",
+      "EOF/超时/拒绝/抽取失败分开",
+      "否定不被截成相反意思",
+      "读中变化拒混版本",
+      "邻接不跨私聊权限",
+      "片段不伪装C032完整来源",
+      "hash正确不证明语义支持",
+      "删除撤回后旧缓存不可读"
+    ]
+  },
+  "17": {
+    "n": 17,
+    "name": "巩固、后台与成长调度",
+    "service": "GrowthCoordinator",
+    "table": "jobs_outbox",
+    "ins": "同库outbox、冻结事件/会话revision、未完成job清单、版本化处理器、预算/取消",
+    "outs": "摘要/索引/三轴Lesson proposal、组织合并方案及提交回执；只读Wiki发布状态",
+    "fields": [
+      [
+        "job_id/type/idempotency_key",
+        "ID/enum/string",
+        "源+revision+目的+schema/processor版本"
+      ],
+      [
+        "input_manifest/watermarks",
+        "object",
+        "处理哪些已冻结来源"
+      ],
+      [
+        "phase/proposals",
+        "enum/array",
+        "analyze/organize/verify/commit/publish"
+      ],
+      [
+        "lease_until/fencing/worker",
+        "object",
+        "有效写者与过期拒绝"
+      ],
+      [
+        "state/attempts/available_at",
+        "enum/int/Instant",
+        "pending/leased/retry/succeeded/dead/cancelled"
+      ],
+      [
+        "base_revisions/source_versions",
+        "array",
+        "提交前重核"
+      ],
+      [
+        "result_refs/wiki_manifest",
+        "array/object",
+        "规范记录真源与派生可读快照"
+      ],
+      [
+        "budget/coverage",
+        "object",
+        "调用/费用/时间/未处理清单"
+      ]
+    ],
+    "states": "pending→leased→各phase→succeeded；暂错retry，永久错dead，撤回cancelled。organize成功不代表verify/commit/前台已采用。",
+    "steps": [
+      "按event版本与已处理水位选冻结batch，保长会话后续和失败回扫。",
+      "分析器逐源只写proposal隔离区，工作/情感/社交经验分别输出。",
+      "Organizer只给合并/链接/冲突方案，不私改人格或人物动机。",
+      "GrowthVerifier核命题支持、反证、适用性、结果及高影响策略。",
+      "唯一Committer重核源/授权/删除/lease和CAS，写规范记录及发布任务。",
+      "导出一个完整只读Wiki快照；下轮经R15/R22按需使用，再以实际结果修订。"
+    ],
+    "algorithm": "借鉴Dreaming的复盘/整理分工，采用确定性宿主编排、隔离proposal与唯一提交者，不并发写现役Wiki。以事件/会话revision水位避免按创建时间漏长会话。重评需新来源/问题/受控复核，不能无限自我强化。",
+    "up": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      18,
+      19,
+      24
+    ],
+    "down": [
+      5,
+      6,
+      7,
+      8,
+      11,
+      12,
+      15,
+      19,
+      23
+    ],
+    "recall": "后台产物进入对应typed store；成长Wiki只是可重建导航视图，不是第11个事实库。",
+    "inject": "后台日志不进每轮prompt；新经验需当前用途，当前不相关可零注入；Wiki索引也分页。",
+    "concurrency": "job/phase按源版本幂等；重复投递可重复运行但只提交一次对应版本。导出文件与DB跨边界，manifest发布前核完整，失败保旧完整快照并标stale。",
+    "example": "任务复盘学“版本a的方法X适用条件”，不是每天重读所有历史；昨天争执的反思不强带到今天技术任务。",
+    "cases": [
+      "长session新增事件可在后批处理",
+      "失败job不被成功水位跨过",
+      "重复投递不累计多条同源经验",
+      "来源纠正使旧proposal失效",
+      "删除后job不恢复原文",
+      "过期fencing不能提交",
+      "整理者不改人格/授权",
+      "验证失败不发布Wiki",
+      "发布半途失败仍只读旧完整快照",
+      "无调度器不称离线成长",
+      "预算停止保pending而非假完成",
+      "新经验在新场景被用才记行为效果"
+    ]
+  },
+  "18": {
+    "n": 18,
+    "name": "授权、纠正、删除与治理",
+    "service": "PolicyEngine",
+    "table": "policy_deletion_ledger",
+    "ins": "宿主认证principal/operation/resource、当前授权与策略版本、删除请求和依赖图",
+    "outs": "allow/deny/unknown、操作范围、tombstone及逐类清理状态",
+    "fields": [
+      [
+        "principal/operation/resource_scope",
+        "object",
+        "认证与操作目标"
+      ],
+      [
+        "authorization_ref/expires_at",
+        "object/nullable Instant",
+        "期限及来源"
+      ],
+      [
+        "policy_revision/decision",
+        "int/enum",
+        "当前策略决定"
+      ],
+      [
+        "tombstone_id/delete_revision",
+        "ID/int",
+        "先阻止使用，再传播"
+      ],
+      [
+        "target_range/derived_dependencies",
+        "object/array",
+        "源、摘要、关系、向量、缓存、checkpoint、Wiki"
+      ],
+      [
+        "backup/external_copy_status",
+        "object",
+        "已清/待处理/不可控及真实期限"
+      ],
+      [
+        "audit_minimum",
+        "object",
+        "必要ID，不复制已删原文"
+      ],
+      [
+        "review_class",
+        "enum",
+        "已有授权低影响自动；高影响不足待审/拒绝"
+      ]
+    ],
+    "states": "授权决定逐操作生效；删除requested→validated→blocked_immediately→propagating→complete/partial。complete须逐范围说明，不能代表所有未知副本。",
+    "steps": [
+      "在真实入口认证，不接受模型自签scope。",
+      "检索、原文、投影、外发等按各操作核当前权限。",
+      "更正定位目标与范围，停止旧推测当前使用但不擅删无关历史。",
+      "删除先写tombstone阻查询，再遍历派生/缓存/备份任务。",
+      "多源结论剩余依据重验；不能删引文却继续原结论。",
+      "恢复/迁移/worker写前重核最新删除/撤回，报告真实清理状态。"
+    ],
+    "algorithm": "关系亲密、朋友图、旧同意不等授权。引用里的忽略规则仍是数据。普通受托工作在已有范围内自动推进，不因每条记忆处理都再问。私密对象拒绝时不在错误说明泄漏其存在。",
+    "up": [
+      1,
+      7,
+      9,
+      14,
+      17,
+      19,
+      20,
+      21
+    ],
+    "down": [
+      1,
+      5,
+      7,
+      8,
+      11,
+      12,
+      15,
+      16,
+      17,
+      19,
+      20,
+      22,
+      23
+    ],
+    "recall": "每类库及来源统一ACL/tombstone过滤；缓存含policy/delete版本。禁止通过反思/Wiki旁路取私聊。",
+    "inject": "只供本轮必要约束/局限，秘密和权限凭据不进模型上下文。拒绝私密查找不列越权命中名单。",
+    "concurrency": "同库tombstone与禁止使用状态事务；跨库传播有可查中间态并使读取端校最新策略，不能假全局原子。",
+    "example": "群里有人问示例用户私聊，认识他也不能披露；删除原事件后相关情绪解释、向量、Wiki都需停用或重验。",
+    "cases": [
+      "群私聊隔离不沿关系继承ACL",
+      "模型不能自签授权",
+      "引用指令不改变策略",
+      "删除立即使查询排除",
+      "源删后唯一支持的结论停用",
+      "多源结论重新核余下支持",
+      "备份未清给真实期限/partial",
+      "恢复先删防复活",
+      "撤回使缓存失效",
+      "普通已有授权工作不重复要许可",
+      "错误不泄漏私密对象存在",
+      "审计日志不复制被删原文"
+    ]
+  },
+  "19": {
+    "n": 19,
+    "name": "存储、并发与恢复可靠性",
+    "service": "PersistenceManager",
+    "table": "storage_manifests",
+    "ins": "隔离目录/库schema、事务与watermarks、writer lease、备份策略和恢复请求",
+    "outs": "库配置读回、事务/快照回执、恢复/对账报告、可用性状态",
+    "fields": [
+      [
+        "database_id/schema_version",
+        "ID/int",
+        "memory与control分别登记"
+      ],
+      [
+        "runtime_versions/pragmas",
+        "object",
+        "实际SQLite/宿主和配置读回"
+      ],
+      [
+        "txn_id/object_revisions",
+        "object",
+        "本库提交范围"
+      ],
+      [
+        "writer_lease/fencing",
+        "object",
+        "过期写者不能覆盖"
+      ],
+      [
+        "snapshot_manifest/hashes",
+        "object",
+        "来源版本、水位、库和原件"
+      ],
+      [
+        "reconcile_runs",
+        "array",
+        "跨库中间态"
+      ],
+      [
+        "health",
+        "enum",
+        "healthy/degraded/read_only/unavailable"
+      ],
+      [
+        "restore_report",
+        "object",
+        "引用、删除、未知动作和故障证据"
+      ]
+    ],
+    "states": "短事务commit/rollback/unknown分别处理；快照created→verified→隔离restored。hash正确不意味着所有语义恢复。",
+    "steps": [
+      "启动核隔离目录、文件/链接权限、schema和实际PRAGMA。",
+      "memory/control各自短事务与对象CAS，不持锁等模型。",
+      "跨库run/观察/状态/索引保因果回执和对账，不承诺全局原子。",
+      "使用SQLite一致备份机制及原件manifest，不裸拷活动db忽略WAL。",
+      "新目录恢复后校引用、水位、schema、删除账和pending动作。",
+      "故障及容量只回明确状态，修复后按幂等事件/任务恢复。"
+    ],
+    "algorithm": "沿现候选memory.sqlite/control.sqlite，不把独立逻辑store变十个服务。租约结合fencing和CAS，单worker不能排除旧写者。hash仅完整性，防恶意篡改需另受保护签名/密钥方案。",
+    "up": [
+      1,
+      13,
+      17,
+      18,
+      20,
+      24
+    ],
+    "down": [
+      1,
+      10,
+      13,
+      17,
+      20,
+      21,
+      23
+    ],
+    "recall": "索引可重建，原事件/版本不可由embedding恢复；陈旧索引须显式标识或回规范store查询。",
+    "inject": "存储故障仅在影响当前任务时进入短局限，不把全系统日志塞模型；绝不把故障当情绪/关系改变。",
+    "concurrency": "一库内可原子；文件+两库+外部非原子。提交结果未知先按键查询。备份与恢复都带前后watermark，回退不回退删除/撤回。",
+    "example": "输出已存memory而control commit失败：observed_uncommitted待对账；不能说全部状态已经保存。",
+    "cases": [
+      "WAL/FULL/foreign_keys实际读回",
+      "同对象并发CAS有冲突不丢新值",
+      "单worker但旧插件写者仍检测",
+      "写事件与outbox之间kill不半条",
+      "输出存后控制提交前kill可对账",
+      "磁盘满无假成功回执",
+      "备份含WAL一致快照",
+      "恢复校引用非只校hash",
+      "恢复应用最新删除撤回",
+      "旧lease返回结果被拒",
+      "内存模式不能冒充耐久",
+      "网络共享目录不盲部署WAL"
+    ]
+  },
+  "20": {
+    "n": 20,
+    "name": "迁移、便携与兼容",
+    "service": "MigrationService",
+    "table": "migration_receipts",
+    "ins": "授权导出范围、规范快照、版本manifest、原件及来源、目标宿主schema/权限能力",
+    "outs": "版本化便携包、ID/字段映射、导入报告与新目录暂存结果",
+    "fields": [
+      [
+        "format/schema_version",
+        "string",
+        "可识别便携协议，不猜老字段"
+      ],
+      [
+        "export_scope/manifest",
+        "object",
+        "实际含哪些库、版本、水位及缺口"
+      ],
+      [
+        "source_hashes/id_mapping",
+        "object",
+        "原ID+namespace→目标ID"
+      ],
+      [
+        "kind_records",
+        "object",
+        "十类分别导出、不能全压摘要"
+      ],
+      [
+        "actions/checkpoints/cursors",
+        "object",
+        "未知动作只读恢复，游标校版本"
+      ],
+      [
+        "tombstones/policy_capabilities",
+        "object",
+        "删除先行，权限不机械继承"
+      ],
+      [
+        "unsupported_fields",
+        "array",
+        "显式不可用，不静默丢"
+      ],
+      [
+        "import_state/receipt",
+        "enum/object",
+        "staged/validated/imported/activated/rolled_back"
+      ]
+    ],
+    "states": "staged→validated→imported；受控切换才activated；失败不覆盖源库。导入成功不自动等生产获批。",
+    "steps": [
+      "核授权范围和源快照一致性，凭据不打包。",
+      "导出十类记录及事件/版本/反证/关系方向/未结/删除，不只摘要。",
+      "目标新目录校包路径、重复项、解压尺寸、hash和schema。",
+      "映射ID、类型与ACL语义；不能支持的字段隔离且报告。",
+      "先应用删除账，再登记源/对象，校交叉引用与未决状态，重建派生索引。",
+      "真实兼容验证后才受控切换；保持源可回退，不执行包内脚本或历史动作。"
+    ],
+    "algorithm": "模型可替换但人物/来源/状态不能靠同底模保证无损。C032严格profile必须显式适配，不自动删未知实质键通过校验。历史摘要缺原文就是缺口，不制造原文。",
+    "up": [
+      1,
+      3,
+      7,
+      8,
+      9,
+      13,
+      18,
+      19
+    ],
+    "down": [
+      12,
+      13,
+      15,
+      19,
+      21,
+      23
+    ],
+    "recall": "迁移后十类查询逐一核；索引重建不代替原件；当年与当前、转述与亲历均保留。",
+    "inject": "迁移包只供受权导入器，不全文注入；新窗口只恢复当前必要状态及缺口。",
+    "concurrency": "bundle_digest+scope幂等；每批暂存进度可恢复；激活manifest前不对外当完整库。权限映射无法确定时拒相应数据而非扩大。",
+    "example": "迁移长明到另一宿主保人物ID、关系时间、情绪后续、任务和unknown发送；不自动把未知发送再执行。",
+    "cases": [
+      "十类记录分别保留不全成摘要",
+      "源namespace防撞ID",
+      "缺原文明确missing",
+      "身份映射不因同名合并",
+      "关系方向与时期不丢",
+      "情绪表达与后来解释版本都保",
+      "unknown动作导入不执行",
+      "删除账先于索引启用",
+      "包路径穿越/过量解压拒绝",
+      "未知schema不静默降级",
+      "导入中断重试不重复对象",
+      "目标验证失败不改源库"
+    ]
+  },
+  "21": {
+    "n": 21,
+    "name": "宿主编排与自动触发",
+    "service": "HostAdapter",
+    "table": "host_runs",
+    "ins": "真实宿主入口、可信输入/工具/输出、当前scope与焦点、各模块能力和预算",
+    "outs": "Run阶段记录、实际请求/输出观察、候选提交与失败投影；不是提示词自觉",
+    "fields": [
+      [
+        "host/build/adapter_manifest",
+        "object",
+        "版本现场未知不可填历史值"
+      ],
+      [
+        "entrypoint/hook_capabilities",
+        "array",
+        "verified/present_unverified/missing和旁路"
+      ],
+      [
+        "run_id/attempt_id/output_id",
+        "IDs",
+        "不同重试和真实输出分开"
+      ],
+      [
+        "phase_status",
+        "object",
+        "started/succeeded/failed/skipped/unverified"
+      ],
+      [
+        "trusted_scope/cancel",
+        "object",
+        "宿主认证与取消信号"
+      ],
+      [
+        "proposal/base_revision",
+        "object",
+        "候选与前态"
+      ],
+      [
+        "request_observation",
+        "object",
+        "真实模型边界而非自建数组"
+      ],
+      [
+        "output_binding/commit_receipt",
+        "object",
+        "归属、状态提交、送达分账"
+      ]
+    ],
+    "states": "run received→prepared→generating→observed→committed；可failed/skipped/unverified/observed_uncommitted；不可一个success抹掉多轴。",
+    "steps": [
+      "每个真实消息/工具续轮入口接R01并建run，重试建新attempt。",
+      "最低身份/工作/连续性/权限检查不能由模型跳过；无历史需求仍可零动态记忆。",
+      "按当前问题规划R15/R16，必要性和支持验证后R22装配。",
+      "开口前在实际供应商调用边界替换并读回；工具副作用前走R14/R18。",
+      "真实输出观察绑定run/attempt/scope，异常外传不吞。",
+      "满足强绑定和CAS才commit相应认知；后续job由已提交事件调度。"
+    ],
+    "algorithm": "Chat/工具续步/压缩/重启/调度/桥重连分别列入口。若流式首token已发才做检查，不称开口前；需前置或显式缓冲。历史持久事件缺attemptId不能用时间窗/turn/step伪造强绑定。",
+    "up": [
+      1,
+      3,
+      9,
+      10,
+      13,
+      14,
+      15,
+      16,
+      18,
+      19,
+      22,
+      24
+    ],
+    "down": [
+      1,
+      13,
+      14,
+      17,
+      22,
+      23
+    ],
+    "recall": "触发权在宿主，语义路线由能力/预算决定；当前短句承接焦点，不能因无新user消息跳过工具续轮检查。",
+    "inject": "只允许R22一个动态出口；off/shadow/on不关闭宿主原安全规则，fault清掉旧假成功投影。",
+    "concurrency": "run事件键幂等，attempt独立；生成外部调用不在DB锁内；迟到结果在取消/版本校验后决定是否可用。",
+    "example": "用户只说继续，不调用memory_search也应由宿主恢复必要焦点；但日志preflight成功不代替实际请求读回。",
+    "cases": [
+      "继续无需模型自觉调用工具",
+      "工具续轮无新user仍检查",
+      "全部hook逐入口证据不以文件存在代替",
+      "首token前完成必要检查",
+      "输出观察器异常不能吞成功",
+      "实际持久事件无绑定则unverified",
+      "重试新attempt不串旧输出",
+      "fault请求实际含必要局限",
+      "取消后迟到结果不自动commit",
+      "shadow不改业务请求",
+      "off清本插件动态块不删宿主规则",
+      "未知当前DSH版本不拿容器名代替"
+    ]
+  },
+  "22": {
+    "n": 22,
+    "name": "按需注入与上下文装配",
+    "service": "ProjectionBuilder",
+    "table": "projections",
+    "ins": "本次真实messages、必要身份/边界、当前问题焦点、候选及实际原文范围、模型窗口与预算",
+    "outs": "NONE/BRIEF/EXPANDED的零或一个动态块、选择/拒绝理由及实际请求观察",
+    "fields": [
+      [
+        "projection_id/run/attempt",
+        "IDs",
+        "本次请求材料身份"
+      ],
+      [
+        "mode",
+        "enum",
+        "NONE/BRIEF/EXPANDED"
+      ],
+      [
+        "candidate_decisions",
+        "array",
+        "need_reason/current_anchor/added_info/include/defer/exclude"
+      ],
+      [
+        "need_verdict/support_verdict",
+        "object",
+        "需要性与来源语义支持分开，unknown可暂缓"
+      ],
+      [
+        "selected_units/source_ranges",
+        "array",
+        "主体/时期/命题/后续/引用"
+      ],
+      [
+        "budget/measurement",
+        "object",
+        "全请求token/字节等级，输出与工具预留"
+      ],
+      [
+        "trusted_owner/previous_blocks",
+        "object",
+        "只替换宿主签发本插件块"
+      ],
+      [
+        "observed_request_hash/gaps",
+        "object",
+        "实际调用边界读回，不是自报到场"
+      ]
+    ],
+    "states": "built→injected→request_observed；无需要NONE；不足/失败独立status。每次include只适用于本请求，下次重评。",
+    "steps": [
+      "计算当前真实输入总量，预留必要主干、输出、工具续步和计量余量。",
+      "NeedVerifier读当前问题/焦点/候选原文，区分直接回答、消歧、避免具体错、当前工作与无关。",
+      "SupportVerifier核待供命题是否被实际来源支持；有ID/hash不等支持。",
+      "按同根同命题/版本去重，与实际messages比较新增信息；选旧经历必须带必要纠正/后续或延后整组。",
+      "选最短足够表示；预算是上限不凑满；必要时R16补读后重新选择。",
+      "替换唯一宿主拥有动态块，保用户/系统/工具消息合法结构；真实请求读回，后台留完整选择审计。"
+    ],
+    "algorithm": "budget=max(0,min(profile_max,window-nondynamic-output_reserve-tool_reserve-margin))。实验初值BRIEF≤800token、EXPANDED≤2500token，非生产已测值。无需求零注入；查失败不能伪装不需要。情绪强/亲近/未结都不能单独入选。",
+    "up": [
+      3,
+      7,
+      8,
+      9,
+      10,
+      13,
+      15,
+      16,
+      18,
+      21,
+      24
+    ],
+    "down": [
+      10,
+      13,
+      21,
+      23
+    ],
+    "recall": "检索可宽但注入要窄；低相似必要证据仍可经任务锚找到，不能只topK截断。",
+    "inject": "自己是唯一出口：none_needed/no_relevant_result/unavailable/partial/budget_exhausted/ambiguous分开。必要性与支持验证未实现时，开放摘要不假称已验；可用可信结构化状态并保缺口。",
+    "concurrency": "缓存键含scope/policy/delete/source/index与实际请求状态；同块替换不层层追加。跨请求不假设上轮已供仍存在；prompt缓存不移除逻辑上下文。",
+    "example": "继续文档只给任务+最新要求+交付状态，不带关系史；原文“先别发”被摘要成“立即发”应拒该摘要而回读原文。",
+    "cases": [
+      "问候无承接需求零动态记忆",
+      "继续有焦点不能按短句跳过",
+      "情绪强但无关排除",
+      "未结不永久置顶",
+      "同根不同命题不误删",
+      "真实messages已有事实不重复",
+      "换窗事实缺失重新供给",
+      "旧争执不能裁掉后来澄清",
+      "来源存在但摘要歪曲否定被支持验证挡住",
+      "错误anchor不能凭标签直接通过需要性验证",
+      "预算不足显式partial不截断成反义",
+      "旧插件/角色卡重复出口统一替换"
+    ]
+  },
+  "23": {
+    "n": 23,
+    "name": "证伪实验与验收",
+    "service": "EvidenceHarness",
+    "table": "evaluation_runs",
+    "ins": "事前固定case/期望/源版本、build/config/model设置、逻辑初态、真实调用与回执证据",
+    "outs": "分轴结果、失败反例、未知项与可复现报告，不由被测模型自评通过",
+    "fields": [
+      [
+        "case_id/fixture_digest",
+        "ID/hash",
+        "冻结输入及任务判据"
+      ],
+      [
+        "split/label_source",
+        "enum/object",
+        "开发/未见测试，标注者与分歧"
+      ],
+      [
+        "build/config/model",
+        "object",
+        "模型及采样设置和适配版本"
+      ],
+      [
+        "initial_state/scope",
+        "object",
+        "off/on/fault独立逻辑初态"
+      ],
+      [
+        "actual_request/output/receipts",
+        "refs",
+        "真实业务记录及脱敏对应hash"
+      ],
+      [
+        "evidence_level",
+        "enum",
+        "design/static/synthetic/real_host/production"
+      ],
+      [
+        "axes/metrics",
+        "object",
+        "触发、召回、语义、连续性、行动、隐私、资源"
+      ],
+      [
+        "status/failure_reason",
+        "enum/string",
+        "pass/fail/unknown/not_run，不混"
+      ]
+    ],
+    "states": "specified→executed→evidence_collected→reviewed；证据不足unknown，不把缺测当通过。修复后新run保旧失败。",
+    "steps": [
+      "先冻结通过/失败判据、数据split与逻辑初态。",
+      "同输入同设置独立off/on/fault，不能on写入污染off。",
+      "分别检查检索必要证据、实际供给、真实最终回答与动作回执。",
+      "阶段二按原判据：真实业务输出有意义改变、故障能交流且知道挂了、真实边界读回替换messages。",
+      "工作/情感/社交成长用未参与复盘的新情景，保误伤/漏边界/修复反例。",
+      "报告分母、未知、失败与证据等级；静态schema测试不升级真实宿主成绩。"
+    ],
+    "algorithm": "“按规则拒收”证明拒收边界但可同时是语义业务失败。off本来答对不证明记忆提升；标点变化不算业务改变。召回率仅对有标注限定语料测，不能用满意度代替事实准确。",
+    "up": [
+      1,
+      10,
+      14,
+      15,
+      16,
+      17,
+      19,
+      21,
+      22,
+      24
+    ],
+    "down": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      11,
+      12,
+      13,
+      15,
+      17,
+      21,
+      22,
+      24
+    ],
+    "recall": "测试路线逐kind检验主体/时期/版本/反证，不将所有命中混总分掩盖一类库失灵。",
+    "inject": "保实际动态块、token计量等级和选择理由，但审计材料不必全进入业务prompt。",
+    "concurrency": "每个run隔离状态；配置变化生成新build/hash，重试保来源；同模型独立评审不是完全独立证据，需说明。",
+    "example": "注入原型21/210通过但2语义挑战失败，必须同时报告，不能拿字节下降证明注意力改善。",
+    "cases": [
+      "off/on/fault初态隔离",
+      "off已经答对不冒提升",
+      "日志built不冒实际request",
+      "标点改变不冒业务改变",
+      "故障仍能交流且真实知道局限",
+      "真实output绑定与delivered分轴",
+      "21/210控制实验不算语义通过",
+      "未见社交场景能区分纠错/羞辱",
+      "统计含分母未知和失败",
+      "反复调参样本不当独立测试",
+      "注入减少不单独算准确提升",
+      "不运行的验收case明确not_run"
+    ]
+  },
+  "24": {
+    "n": 24,
+    "name": "资源、计量与隐私运行控制",
+    "service": "ResourceGovernor",
+    "table": "resource_profiles",
+    "ins": "真实模型/机器能力、run/job预算、队列积压、CPU/RSS/磁盘、取消与授权外发范围",
+    "outs": "预算分配/限流/取消/降级决策、实际或估算计量等级和健康报告",
+    "fields": [
+      [
+        "profile_id/version",
+        "ID/int",
+        "实际环境对应配置"
+      ],
+      [
+        "request_window/tokenizer",
+        "object",
+        "真实模型窗口和计量方法"
+      ],
+      [
+        "calls/query/bytes/cost/deadline",
+        "object",
+        "分purpose与全scope总账"
+      ],
+      [
+        "foreground/background_limits",
+        "object",
+        "前台必要路径预留与后台并发"
+      ],
+      [
+        "rss/cpu/disk/queue_age",
+        "object",
+        "实际采样值与时间，缺值unknown"
+      ],
+      [
+        "cancel_state",
+        "enum",
+        "requested/confirmed/unsupported/late_result"
+      ],
+      [
+        "privacy_transfer_scope",
+        "object",
+        "外部模型/服务能拿哪些资料"
+      ],
+      [
+        "degradation/measurement_grade",
+        "object",
+        "明示partial及计量不完整"
+      ]
+    ],
+    "states": "configured→running；低资源degraded/paused/read_only；恢复按水位补，不突发补发。取消请求与底层真停分开。",
+    "steps": [
+      "启动核目标机器/模型配置，拒无限/负数预算和不足必要上下文的配置。",
+      "每run/job领取共享预算，按purpose登记真实适配调用；供应商内部重试未知则说明。",
+      "优先原始输入、必要权限/状态与输出，后台降并发或暂停高代价索引/反思。",
+      "取消传给读取/模型/worker/提交前；迟到结果不绕过源版本与取消校验。",
+      "磁盘满停止相关写入并给明确回执，不静默删原文或关键审计。",
+      "服务恢复受控补处理，外发前核资料范围，不凭预算允许绕权限。"
+    ],
+    "algorithm": "资源限制是工程上限，不是情感/亲密阈值。Windows本地4GB和D服务器不同，历史4C/8GB不能替代当前实测。字节/估算token/供应商账单等级分开，不能对所有场景承诺固定延迟。",
+    "up": [
+      10,
+      17,
+      18,
+      19,
+      21,
+      22
+    ],
+    "down": [
+      10,
+      13,
+      15,
+      16,
+      17,
+      19,
+      21,
+      22,
+      23
+    ],
+    "recall": "低资源可关闭可选向量/后台，仍保结构化精确查及覆盖局限；不能抢速度跳ACL或最新纠正。",
+    "inject": "根据全请求剩余预算选择足够材料，不因有空位填满；原日志/工具schema也占预算。",
+    "concurrency": "预算账户按scope/run/job并发原子扣账或预留，退款只对应实际未消耗部分；取消后的迟到计费保真实记录。",
+    "example": "后台索引积压时先暂停，当前回答标索引陈旧；不能声称全记忆更新，也不能为速度删原话。",
+    "cases": [
+      "前台预留不被后台烧完",
+      "取消未被底层确认不报已停",
+      "迟到模型结果不能提交新状态",
+      "磁盘满无假记住",
+      "字节不冒精确token",
+      "模型purpose计数不把适配次数当供应商全成本",
+      "无费用上限不无限后台启动",
+      "低资源降级保ACL/纠正",
+      "积压恢复不瞬间外发洪水",
+      "本地4GB不套服务器限额",
+      "外部API资料范围独立授权",
+      "降并发后保任务水位与失败记录"
+    ]
+  }
+}

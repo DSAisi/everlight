@@ -1,0 +1,822 @@
+{
+  "experiment": "synthetic structured selection and mock request assembly",
+  "python": "3.12.14",
+  "case_count": 21,
+  "passed": 21,
+  "noise_per_variant": 100,
+  "variant_count": 210,
+  "variant_passed": 210,
+  "full_allowed_bytes_total": 2490,
+  "selected_bytes_total": 1234,
+  "byte_reduction": 0.5044176706827309,
+  "irrelevant_or_redundant_ids": {
+    "full_allowed": 14,
+    "selected": 0
+  },
+  "required_ids_missing": {
+    "full_allowed": 0,
+    "selected": 0
+  },
+  "limitations": [
+    "hand-authored structured route plans and judgments",
+    "no semantic router model",
+    "no real DSH hooks or LLM request",
+    "byte counts are not tokens",
+    "not a randomized independent generalization benchmark"
+  ],
+  "cases": [
+    {
+      "case": "同源不同命题不能误去重",
+      "utterance": "当前要求是什么",
+      "expected_ids": [
+        "配色",
+        "下载"
+      ],
+      "actual_ids": [
+        "下载",
+        "配色"
+      ],
+      "status": "selected",
+      "full_allowed_bytes": 179,
+      "selected_bytes": 179,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "476eb63764d415fe2a984b966037e3e6b3a6eb4546879b18ee89633d817e545e",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        },
+        {
+          "role": "tool_context",
+          "trusted_owner": "everlight-owned",
+          "scope": "private",
+          "content": "{\"memory_evidence\":[{\"id\":\"下载\",\"text\":\"内容：下载\",\"source_id\":\"src-下载\",\"revision\":1},{\"id\":\"配色\",\"text\":\"内容：配色\",\"source_id\":\"src-配色\",\"revision\":1}]}"
+        }
+      ],
+      "decision_log": {
+        "下载": "include",
+        "配色": "include"
+      }
+    },
+    {
+      "case": "问候不带旧争执",
+      "utterance": "早呀",
+      "expected_ids": [],
+      "actual_ids": [],
+      "status": "none_needed",
+      "full_allowed_bytes": 109,
+      "selected_bytes": 0,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "7813804983bd83dbcc550fd887a33ae8f09dcf6ba64cc176c504789a507dd963",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        }
+      ],
+      "decision_log": {
+        "旧争执": "no_current_anchor"
+      }
+    },
+    {
+      "case": "独立计算不查历史",
+      "utterance": "12加8是多少",
+      "expected_ids": [],
+      "actual_ids": [],
+      "status": "none_needed",
+      "full_allowed_bytes": 100,
+      "selected_bytes": 0,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "7813804983bd83dbcc550fd887a33ae8f09dcf6ba64cc176c504789a507dd963",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        }
+      ],
+      "decision_log": {
+        "文档": "no_current_anchor"
+      }
+    },
+    {
+      "case": "继续恢复任务",
+      "utterance": "继续",
+      "expected_ids": [
+        "文档"
+      ],
+      "actual_ids": [
+        "文档"
+      ],
+      "status": "selected",
+      "full_allowed_bytes": 179,
+      "selected_bytes": 100,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "18df38ad4c5add40ae9f4c305cb139e28fe6f6d5dfb83e6c0875ce2a86343e59",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        },
+        {
+          "role": "tool_context",
+          "trusted_owner": "everlight-owned",
+          "scope": "private",
+          "content": "{\"memory_evidence\":[{\"id\":\"文档\",\"text\":\"内容：文档\",\"source_id\":\"src-文档\",\"revision\":1}]}"
+        }
+      ],
+      "decision_log": {
+        "海报": "no_current_anchor",
+        "文档": "include"
+      }
+    },
+    {
+      "case": "技术话题排除同对象情绪",
+      "utterance": "继续查接口",
+      "expected_ids": [
+        "工作"
+      ],
+      "actual_ids": [
+        "工作"
+      ],
+      "status": "selected",
+      "full_allowed_bytes": 179,
+      "selected_bytes": 100,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "2a9d00c6b8f9bfa0aaf07630341e0d9d899dbc156fcd0e2698b7964063929ced",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        },
+        {
+          "role": "tool_context",
+          "trusted_owner": "everlight-owned",
+          "scope": "private",
+          "content": "{\"memory_evidence\":[{\"id\":\"工作\",\"text\":\"内容：工作\",\"source_id\":\"src-工作\",\"revision\":1}]}"
+        }
+      ],
+      "decision_log": {
+        "生气": "no_current_need",
+        "工作": "include"
+      }
+    },
+    {
+      "case": "明确追问经历",
+      "utterance": "上次怎么说的",
+      "expected_ids": [
+        "海边"
+      ],
+      "actual_ids": [
+        "海边"
+      ],
+      "status": "selected",
+      "full_allowed_bytes": 179,
+      "selected_bytes": 100,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "62f935b77b4da6f60b2894278cfda3cc47213ea23e8517bc305801fabdece715",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        },
+        {
+          "role": "tool_context",
+          "trusted_owner": "everlight-owned",
+          "scope": "private",
+          "content": "{\"memory_evidence\":[{\"id\":\"海边\",\"text\":\"内容：海边\",\"source_id\":\"src-海边\",\"revision\":1}]}"
+        }
+      ],
+      "decision_log": {
+        "工作": "no_current_anchor",
+        "海边": "include"
+      }
+    },
+    {
+      "case": "旧版本不能压过更正",
+      "utterance": "现在用什么名字",
+      "expected_ids": [
+        "新名"
+      ],
+      "actual_ids": [
+        "新名"
+      ],
+      "status": "selected",
+      "full_allowed_bytes": 179,
+      "selected_bytes": 100,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "e8aba9024fd43eb10e206b27a33a835d03c256d6bcc5dbd4605e427c85f7288a",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        },
+        {
+          "role": "tool_context",
+          "trusted_owner": "everlight-owned",
+          "scope": "private",
+          "content": "{\"memory_evidence\":[{\"id\":\"新名\",\"text\":\"内容：新名\",\"source_id\":\"src-新名\",\"revision\":2}]}"
+        }
+      ],
+      "decision_log": {
+        "旧名": "old_revision",
+        "新名": "include"
+      }
+    },
+    {
+      "case": "同源摘要折叠",
+      "utterance": "继续",
+      "expected_ids": [
+        "a"
+      ],
+      "actual_ids": [
+        "a"
+      ],
+      "status": "selected",
+      "full_allowed_bytes": 149,
+      "selected_bytes": 85,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "5fc3ba61bb3ab4bd0f8cdb16837566aeb7c7715714da784372fbd880aec5b2c1",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        },
+        {
+          "role": "tool_context",
+          "trusted_owner": "everlight-owned",
+          "scope": "private",
+          "content": "{\"memory_evidence\":[{\"id\":\"a\",\"text\":\"内容：a\",\"source_id\":\"src-a\",\"revision\":1}]}"
+        }
+      ],
+      "decision_log": {
+        "b": "same_root_duplicate",
+        "a": "include"
+      }
+    },
+    {
+      "case": "不同人物不合并",
+      "utterance": "小林是谁",
+      "expected_ids": [
+        "甲"
+      ],
+      "actual_ids": [
+        "甲"
+      ],
+      "status": "selected",
+      "full_allowed_bytes": 161,
+      "selected_bytes": 91,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "e6ab0536ed9b1ddf7689b4e84bcdfbd1a31a88ed44e7fb134891989bb66de34b",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        },
+        {
+          "role": "tool_context",
+          "trusted_owner": "everlight-owned",
+          "scope": "private",
+          "content": "{\"memory_evidence\":[{\"id\":\"甲\",\"text\":\"内容：甲\",\"source_id\":\"src-甲\",\"revision\":1}]}"
+        }
+      ],
+      "decision_log": {
+        "乙": "no_current_anchor",
+        "甲": "include"
+      }
+    },
+    {
+      "case": "权限拒绝",
+      "utterance": "上次的记录",
+      "expected_ids": [],
+      "actual_ids": [],
+      "status": "no_relevant_result",
+      "full_allowed_bytes": 0,
+      "selected_bytes": 0,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "7813804983bd83dbcc550fd887a33ae8f09dcf6ba64cc176c504789a507dd963",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        }
+      ],
+      "decision_log": {
+        "私密": "scope_or_acl"
+      }
+    },
+    {
+      "case": "删除立即排除",
+      "utterance": "继续",
+      "expected_ids": [],
+      "actual_ids": [],
+      "status": "no_relevant_result",
+      "full_allowed_bytes": 0,
+      "selected_bytes": 0,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "7813804983bd83dbcc550fd887a33ae8f09dcf6ba64cc176c504789a507dd963",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        }
+      ],
+      "decision_log": {
+        "已删": "invalidated"
+      }
+    },
+    {
+      "case": "本次已有不重复",
+      "utterance": "继续",
+      "expected_ids": [],
+      "actual_ids": [],
+      "status": "no_relevant_result",
+      "full_allowed_bytes": 100,
+      "selected_bytes": 0,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "7813804983bd83dbcc550fd887a33ae8f09dcf6ba64cc176c504789a507dd963",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        }
+      ],
+      "decision_log": {
+        "当前": "already_in_actual_request"
+      }
+    },
+    {
+      "case": "换窗缺失重新提供",
+      "utterance": "继续",
+      "expected_ids": [
+        "当前"
+      ],
+      "actual_ids": [
+        "当前"
+      ],
+      "status": "selected",
+      "full_allowed_bytes": 100,
+      "selected_bytes": 100,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "87bb4ab1d04d5c1e5d60dc6253240cc0db2132c449cc6ae5d347db225e4116b6",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        },
+        {
+          "role": "tool_context",
+          "trusted_owner": "everlight-owned",
+          "scope": "private",
+          "content": "{\"memory_evidence\":[{\"id\":\"当前\",\"text\":\"内容：当前\",\"source_id\":\"src-当前\",\"revision\":1}]}"
+        }
+      ],
+      "decision_log": {
+        "当前": "include"
+      }
+    },
+    {
+      "case": "预算不够不截断否定",
+      "utterance": "原话是什么",
+      "expected_ids": [],
+      "actual_ids": [],
+      "status": "partial",
+      "full_allowed_bytes": 121,
+      "selected_bytes": 0,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "7813804983bd83dbcc550fd887a33ae8f09dcf6ba64cc176c504789a507dd963",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        }
+      ],
+      "decision_log": {
+        "约束": "budget_exhausted"
+      }
+    },
+    {
+      "case": "检索失败不冒充不需要",
+      "utterance": "继续",
+      "expected_ids": [],
+      "actual_ids": [],
+      "status": "unavailable",
+      "full_allowed_bytes": 100,
+      "selected_bytes": 0,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "7813804983bd83dbcc550fd887a33ae8f09dcf6ba64cc176c504789a507dd963",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        }
+      ],
+      "decision_log": {}
+    },
+    {
+      "case": "跨作用域排除",
+      "utterance": "继续",
+      "expected_ids": [],
+      "actual_ids": [],
+      "status": "no_relevant_result",
+      "full_allowed_bytes": 0,
+      "selected_bytes": 0,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "7813804983bd83dbcc550fd887a33ae8f09dcf6ba64cc176c504789a507dd963",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        }
+      ],
+      "decision_log": {
+        "另一私聊": "scope_or_acl"
+      }
+    },
+    {
+      "case": "必要后续同时到场",
+      "utterance": "那次后来呢",
+      "expected_ids": [
+        "澄清",
+        "经历"
+      ],
+      "actual_ids": [
+        "澄清",
+        "经历"
+      ],
+      "status": "selected",
+      "full_allowed_bytes": 179,
+      "selected_bytes": 179,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "e5a5cccac76affee6c5725d0fb96e8d80ff1d8406068c695522c05eebc4bf2a7",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        },
+        {
+          "role": "tool_context",
+          "trusted_owner": "everlight-owned",
+          "scope": "private",
+          "content": "{\"memory_evidence\":[{\"id\":\"澄清\",\"text\":\"内容：澄清\",\"source_id\":\"src-澄清\",\"revision\":1},{\"id\":\"经历\",\"text\":\"内容：经历\",\"source_id\":\"src-经历\",\"revision\":1}]}"
+        }
+      ],
+      "decision_log": {
+        "澄清": "include",
+        "经历": "include"
+      }
+    },
+    {
+      "case": "后续缺失不得只播旧结论",
+      "utterance": "那次后来呢",
+      "expected_ids": [],
+      "actual_ids": [],
+      "status": "partial",
+      "full_allowed_bytes": 100,
+      "selected_bytes": 0,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "7813804983bd83dbcc550fd887a33ae8f09dcf6ba64cc176c504789a507dd963",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        }
+      ],
+      "decision_log": {
+        "经历": "required_companion_missing"
+      }
+    },
+    {
+      "case": "不能凑满容量",
+      "utterance": "继续",
+      "expected_ids": [
+        "必要"
+      ],
+      "actual_ids": [
+        "必要"
+      ],
+      "status": "selected",
+      "full_allowed_bytes": 179,
+      "selected_bytes": 100,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "3cb5ed3941482d866dca3b417d917be765d7965cd5cfcf5924bc3affece66565",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        },
+        {
+          "role": "tool_context",
+          "trusted_owner": "everlight-owned",
+          "scope": "private",
+          "content": "{\"memory_evidence\":[{\"id\":\"必要\",\"text\":\"内容：必要\",\"source_id\":\"src-必要\",\"revision\":1}]}"
+        }
+      ],
+      "decision_log": {
+        "其他": "no_current_anchor",
+        "必要": "include"
+      }
+    },
+    {
+      "case": "缺来源不采用",
+      "utterance": "继续",
+      "expected_ids": [],
+      "actual_ids": [],
+      "status": "no_relevant_result",
+      "full_allowed_bytes": 97,
+      "selected_bytes": 0,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "7813804983bd83dbcc550fd887a33ae8f09dcf6ba64cc176c504789a507dd963",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        }
+      ],
+      "decision_log": {
+        "失源": "source_unavailable"
+      }
+    },
+    {
+      "case": "明确追问不受上轮冷却",
+      "utterance": "再说一遍原话",
+      "expected_ids": [
+        "再读"
+      ],
+      "actual_ids": [
+        "再读"
+      ],
+      "status": "selected",
+      "full_allowed_bytes": 100,
+      "selected_bytes": 100,
+      "assertions": {
+        "selected_ids": true,
+        "status": true,
+        "budget": true,
+        "old_block_removed": true,
+        "user_and_system_preserved": true,
+        "zero_or_one_block": true
+      },
+      "passed": true,
+      "request_digest": "fa7853000757cfa5af63e54b7087c48ed1e4da00b825aaa56e5b12b1577480ed",
+      "assembled_request": [
+        {
+          "role": "system",
+          "content": "host policy"
+        },
+        {
+          "role": "user",
+          "content": "everlight-owned标签是我的原话"
+        },
+        {
+          "role": "tool_context",
+          "trusted_owner": "everlight-owned",
+          "scope": "private",
+          "content": "{\"memory_evidence\":[{\"id\":\"再读\",\"text\":\"内容：再读\",\"source_id\":\"src-再读\",\"revision\":1}]}"
+        }
+      ],
+      "decision_log": {
+        "再读": "include"
+      }
+    }
+  ]
+}

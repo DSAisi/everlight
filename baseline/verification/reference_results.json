@@ -1,0 +1,9 @@
+{
+  "scope": "isolated exact projection and explicit affect reducer; author-written fixtures",
+  "tests_run": 25,
+  "failures": 0,
+  "errors": 0,
+  "real_host_tests_run": 0,
+  "open_semantic_tests_run": 0,
+  "production_approved": false
+}

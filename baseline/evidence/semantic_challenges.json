@@ -1,0 +1,24 @@
+{
+  "challenge_cases": 2,
+  "semantic_failures": 2,
+  "cases": [
+    {
+      "case": "错误路由把无关旅行标成文档",
+      "expected_ids": [],
+      "actual_ids": [
+        "wrong-route"
+      ],
+      "semantic_requirement_met": false,
+      "diagnosis": "prototype trusts structured routing; checks source existence but not entailment"
+    },
+    {
+      "case": "摘要有来源但歪曲否定",
+      "expected_ids": [],
+      "actual_ids": [
+        "bad-summary"
+      ],
+      "semantic_requirement_met": false,
+      "diagnosis": "prototype trusts structured routing; checks source existence but not entailment"
+    }
+  ]
+}

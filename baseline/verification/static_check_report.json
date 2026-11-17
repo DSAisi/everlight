@@ -1,0 +1,481 @@
+{
+  "scope": "document structure and target DDL only",
+  "sqlite_version": "3.53.1",
+  "checks_passed": 94,
+  "checks_total": 94,
+  "checks": [
+    {
+      "check": "24 module files",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R01 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R01 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R02 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R02 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R03 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R03 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R04 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R04 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R05 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R05 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R06 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R06 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R07 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R07 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R08 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R08 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R09 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R09 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R10 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R10 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R11 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R11 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R12 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R12 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R13 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R13 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R14 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R14 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R15 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R15 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R16 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R16 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R17 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R17 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R18 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R18 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R19 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R19 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R20 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R20 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R21 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R21 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R22 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R22 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R23 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R23 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R24 18 sections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "R24 36 unique cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "module registry all 24 modules",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "864 cases all not_run",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "40 chain cases all not_run",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "all 24 modules covered by chain cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "valid module references",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "markdown table widths",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "JSON examples parse",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "DDL executes and foreign keys on",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "typed insert working",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "typed insert episodic",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "typed insert semantic",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "typed insert procedural",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "typed insert relational",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "typed insert emotional",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "typed insert identity",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "typed insert metamemory",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "typed insert reflective",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "typed insert atlas",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "cross-kind write rejected working",
+      "passed": true,
+      "detail": "FOREIGN KEY constraint failed"
+    },
+    {
+      "check": "invalid JSON rejected working",
+      "passed": true,
+      "detail": "CHECK constraint failed: acceptance_json IS NULL OR json_valid(acceptance_json)"
+    },
+    {
+      "check": "cross-kind write rejected episodic",
+      "passed": true,
+      "detail": "FOREIGN KEY constraint failed"
+    },
+    {
+      "check": "invalid JSON rejected episodic",
+      "passed": true,
+      "detail": "CHECK constraint failed: json_valid(event_refs_json)"
+    },
+    {
+      "check": "cross-kind write rejected semantic",
+      "passed": true,
+      "detail": "FOREIGN KEY constraint failed"
+    },
+    {
+      "check": "invalid JSON rejected semantic",
+      "passed": true,
+      "detail": "CHECK constraint failed: json_valid(value_json)"
+    },
+    {
+      "check": "cross-kind write rejected procedural",
+      "passed": true,
+      "detail": "FOREIGN KEY constraint failed"
+    },
+    {
+      "check": "invalid JSON rejected procedural",
+      "passed": true,
+      "detail": "CHECK constraint failed: json_valid(environment_json)"
+    },
+    {
+      "check": "cross-kind write rejected relational",
+      "passed": true,
+      "detail": "FOREIGN KEY constraint failed"
+    },
+    {
+      "check": "invalid JSON rejected relational",
+      "passed": true,
+      "detail": "CHECK constraint failed: json_valid(details_json)"
+    },
+    {
+      "check": "cross-kind write rejected emotional",
+      "passed": true,
+      "detail": "FOREIGN KEY constraint failed"
+    },
+    {
+      "check": "invalid JSON rejected emotional",
+      "passed": true,
+      "detail": "CHECK constraint failed: interpretation_json IS NULL OR json_valid(interpretation_json)"
+    },
+    {
+      "check": "cross-kind write rejected identity",
+      "passed": true,
+      "detail": "FOREIGN KEY constraint failed"
+    },
+    {
+      "check": "invalid JSON rejected identity",
+      "passed": true,
+      "detail": "CHECK constraint failed: json_valid(value_json)"
+    },
+    {
+      "check": "cross-kind write rejected metamemory",
+      "passed": true,
+      "detail": "FOREIGN KEY constraint failed"
+    },
+    {
+      "check": "invalid JSON rejected metamemory",
+      "passed": true,
+      "detail": "CHECK constraint failed: json_valid(coverage_json)"
+    },
+    {
+      "check": "cross-kind write rejected reflective",
+      "passed": true,
+      "detail": "FOREIGN KEY constraint failed"
+    },
+    {
+      "check": "invalid JSON rejected reflective",
+      "passed": true,
+      "detail": "CHECK constraint failed: interpretation_json IS NULL OR json_valid(interpretation_json)"
+    },
+    {
+      "check": "cross-kind write rejected atlas",
+      "passed": true,
+      "detail": "FOREIGN KEY constraint failed"
+    },
+    {
+      "check": "invalid JSON rejected atlas",
+      "passed": true,
+      "detail": "CHECK constraint failed: json_valid(extraction_json)"
+    },
+    {
+      "check": "unknown kind rejected",
+      "passed": true,
+      "detail": "CHECK constraint failed: kind IN ('working','episodic','semantic','procedural','relational','emotional','identity','metamemory','reflective','atlas')"
+    },
+    {
+      "check": "negative revision rejected",
+      "passed": true,
+      "detail": "CHECK constraint failed: revision>=1"
+    },
+    {
+      "check": "invalid source range rejected",
+      "passed": true,
+      "detail": "CHECK constraint failed: (start_byte IS NULL AND end_byte IS NULL) OR (start_byte IS NOT NULL AND end_byte IS NOT NULL AND start_byte>=0 AND end_byte>start_byte)"
+    },
+    {
+      "check": "CAS SQL pattern one winner",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "base/detail rollback consistent",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no foreign-key violations",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "historical failed semantic challenges retained",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "module_acceptance_executed": 0,
+  "integration_acceptance_executed": 0,
+  "production_approved": false
+}

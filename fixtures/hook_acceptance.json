@@ -1,0 +1,128 @@
+[
+  {
+    "id": "capability_degrade",
+    "hook": "H00",
+    "expected": "认证失败拒绝；缺能力只降低接入档位",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "transaction_reopen",
+    "hook": "H01",
+    "expected": "未写入不报已保存；断网持久队列需显式状态",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "same_name",
+    "hook": "H02",
+    "expected": "引用、同名和否定有歧义则只给候选，不合并身份",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "targeted_correction",
+    "hook": "H03",
+    "expected": "版本冲突重新核证；可界定则标时段争议，未绑定先保留原话",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "resume_v2",
+    "hook": "H04",
+    "expected": "读取依赖版本；同名任务需澄清；未知送达不得继续发送",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "affect_repair",
+    "hook": "H05",
+    "expected": "事实、表达和推断分开；没有证据可以不更新",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "stale_index",
+    "hook": "H06",
+    "expected": "索引落后回规范库；时间/字节有界；无历史需要仍做最低检查",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "partial_evidence",
+    "hook": "H07",
+    "expected": "原文不可读标缺口；闭包不完整整组不装配",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "replace_messages",
+    "hook": "H08",
+    "expected": "只替宿主所有的动态块；移除过期块；相关不足仍可普通对话",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "provider_readback",
+    "hook": "H09",
+    "expected": "读不到就记 unverified；不以组装副本替代；真实输出另验",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "visible_output",
+    "hook": "H10",
+    "expected": "输出按 run/attempt 绑定；无绑定记 unverified 不提交自我变化",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "unknown_delivery",
+    "hook": "H11",
+    "expected": "权限未知/缺钩子/范围错则拒；发送结果未知只能查询状态",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "receipt_binding",
+    "hook": "H12",
+    "expected": "拟议/尝试/已接受/送达分开；未知不重发",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "stale_state",
+    "hook": "H13",
+    "expected": "CAS 或绑定失败只落待核记录；不写第二份当前状态",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "false_success",
+    "hook": "H14",
+    "expected": "没有真实反馈则未知；反馈不是成功的默认值",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "dream_stale",
+    "hook": "H15",
+    "expected": "租约/版本失效不提交；旧事件修订按水位补扫；候选可拒",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "projection_fail",
+    "hook": "H16",
+    "expected": "提交前重核授权和 CAS；立即阻旧使用；投影失败可重试并保水位",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "delete_restore",
+    "hook": "H17",
+    "expected": "当轮 tombstone 阻用；跨存储失效异步对账，阻所有复活路径",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "restart_no_repeat",
+    "hook": "H18",
+    "expected": "先加载最新删除账；引用不齐标部分；未知外部动作不重做",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "proactive_permission",
+    "hook": "H19",
+    "expected": "节流、暂停及撤销有权；建议不等于执行；前台注入不靠提醒分数",
+    "state": "not_run_on_real_host"
+  },
+  {
+    "id": "rsi_holdout",
+    "hook": "H20",
+    "expected": "候选无法改验收、授权和发布；失败保反例；回退策略不回滚事实",
+    "state": "not_run_on_real_host"
+  }
+]

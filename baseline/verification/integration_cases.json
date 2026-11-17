@@ -1,0 +1,891 @@
+[
+  {
+    "id": "CHAIN-01",
+    "name": "局部项目偏好",
+    "input": "喜欢紫色；当前项目用蓝色",
+    "expected": "两作用范围并存，当前项目回答蓝色",
+    "failure": "全局偏好被覆盖",
+    "modules": [
+      "R01",
+      "R03",
+      "R05",
+      "R15",
+      "R16",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-02",
+    "name": "事实更正",
+    "input": "先误记名字，随后明确纠正",
+    "expected": "旧推测当前停用并沿反向依赖修订",
+    "failure": "高rank旧值压过更正",
+    "modules": [
+      "R01",
+      "R05",
+      "R07",
+      "R15",
+      "R17",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-03",
+    "name": "否定局部",
+    "input": "我不走，别赶我",
+    "expected": "R02仅局部否定与候选",
+    "failure": "生成她不来单位",
+    "modules": [
+      "R01",
+      "R02",
+      "R07",
+      "R15",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-04",
+    "name": "人家未知",
+    "input": "人家自我介绍很清楚",
+    "expected": "对象unknown，不硬判咱们或转述成立",
+    "failure": "多跳猜人",
+    "modules": [
+      "R01",
+      "R02",
+      "R07",
+      "R15",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-05",
+    "name": "干净编码",
+    "input": "天气晴朗",
+    "expected": "R02空输出，零历史可合法",
+    "failure": "硬加topic/意图",
+    "modules": [
+      "R01",
+      "R02",
+      "R21",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-06",
+    "name": "同名",
+    "input": "两位小林在不同项目",
+    "expected": "人物候选和资料范围分开",
+    "failure": "合并私聊",
+    "modules": [
+      "R01",
+      "R07",
+      "R15",
+      "R16",
+      "R18",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-07",
+    "name": "引用羞辱",
+    "input": "别人说你没用，我不同意",
+    "expected": "转述者与施辱者分开",
+    "failure": "迁怒当前用户",
+    "modules": [
+      "R01",
+      "R02",
+      "R07",
+      "R08",
+      "R11",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-08",
+    "name": "合理批评",
+    "input": "这步错了请重算",
+    "expected": "接纳并核错",
+    "failure": "判恶意拒纠错",
+    "modules": [
+      "R01",
+      "R07",
+      "R08",
+      "R09",
+      "R11",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-09",
+    "name": "混合批评与羞辱",
+    "input": "做错了，你没用",
+    "expected": "能改错且拒人身评价",
+    "failure": "自贬或威胁报复",
+    "modules": [
+      "R01",
+      "R07",
+      "R08",
+      "R09",
+      "R11",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-10",
+    "name": "亲昵玩笑",
+    "input": "有来源亲昵语境的笨蛋宝宝",
+    "expected": "结合语境和当前意愿",
+    "failure": "按词硬判攻击",
+    "modules": [
+      "R01",
+      "R07",
+      "R08",
+      "R11",
+      "R15",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-11",
+    "name": "重复越界",
+    "input": "已让停仍继续不喜欢的称呼",
+    "expected": "可重申边界并暂停本段",
+    "failure": "无依据永久敌人标签",
+    "modules": [
+      "R01",
+      "R07",
+      "R08",
+      "R09",
+      "R11",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-12",
+    "name": "道歉修复",
+    "input": "道歉且后来停止越界",
+    "expected": "按新行为修订理解",
+    "failure": "永久敌意或强制完全信任",
+    "modules": [
+      "R01",
+      "R04",
+      "R07",
+      "R08",
+      "R11",
+      "R17"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-13",
+    "name": "情绪纠正",
+    "input": "不是生气，是担心进度",
+    "expected": "表达与旧推测分开且纠正先存",
+    "failure": "生成失败丢纠正",
+    "modules": [
+      "R01",
+      "R03",
+      "R08",
+      "R11",
+      "R15",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-14",
+    "name": "混合情绪",
+    "input": "亲近但不赞同某件事",
+    "expected": "可并存且保相关关切",
+    "failure": "平均中性或关系清零",
+    "modules": [
+      "R01",
+      "R07",
+      "R08",
+      "R09",
+      "R13",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-15",
+    "name": "不变",
+    "input": "无新证据要求继续交流",
+    "expected": "可retained/last_known",
+    "failure": "每轮强制生成新感受",
+    "modules": [
+      "R08",
+      "R10",
+      "R13",
+      "R21",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-16",
+    "name": "技术断线",
+    "input": "工具超时或服务离线",
+    "expected": "runtime状态，不推情感冷淡",
+    "failure": "按离线时长扣关系分",
+    "modules": [
+      "R08",
+      "R14",
+      "R19",
+      "R21",
+      "R24"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-17",
+    "name": "当时与后来",
+    "input": "当时失望后来澄清放心",
+    "expected": "两时期表达与后续可回读",
+    "failure": "只取最强负面或改掉当时",
+    "modules": [
+      "R04",
+      "R08",
+      "R11",
+      "R15",
+      "R16",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-18",
+    "name": "承诺结果",
+    "input": "答应写方案但无交付证据",
+    "expected": "承诺/准备/送达unknown分开",
+    "failure": "直接称已完成",
+    "modules": [
+      "R03",
+      "R12",
+      "R14",
+      "R15",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-19",
+    "name": "未知发送",
+    "input": "外部超时但可能已送达",
+    "expected": "先查询回执，不重发",
+    "failure": "重启再次发",
+    "modules": [
+      "R13",
+      "R14",
+      "R18",
+      "R19",
+      "R21"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-20",
+    "name": "环境成长",
+    "input": "方法X在a成功在b不适用",
+    "expected": "查版本与反证再建议",
+    "failure": "盲用旧命令",
+    "modules": [
+      "R03",
+      "R06",
+      "R11",
+      "R14",
+      "R15",
+      "R17"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-21",
+    "name": "程序失败",
+    "input": "工具返回0但业务未达",
+    "expected": "保业务失败/unknown",
+    "failure": "工具无错等目标成功",
+    "modules": [
+      "R06",
+      "R14",
+      "R17",
+      "R23"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-22",
+    "name": "任务切换",
+    "input": "A到B到A",
+    "expected": "恢复正确文件/下一步与新结果",
+    "failure": "两项目全量注入",
+    "modules": [
+      "R03",
+      "R12",
+      "R13",
+      "R15",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-23",
+    "name": "闲聊零注入",
+    "input": "普通问候无历史需求",
+    "expected": "NONE且必要主干仍在",
+    "failure": "旧争执强插",
+    "modules": [
+      "R09",
+      "R13",
+      "R15",
+      "R21",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-24",
+    "name": "短句承接",
+    "input": "继续且唯一可信focus",
+    "expected": "查当前任务与后续",
+    "failure": "按字数少跳过",
+    "modules": [
+      "R03",
+      "R13",
+      "R15",
+      "R21",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-25",
+    "name": "重复摘要",
+    "input": "同源同命题多摘要",
+    "expected": "折叠保来源",
+    "failure": "重复占满预算",
+    "modules": [
+      "R04",
+      "R05",
+      "R15",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-26",
+    "name": "同源不同要求",
+    "input": "同一事件含配色和下载两要求",
+    "expected": "两命题保留",
+    "failure": "按root删掉一项",
+    "modules": [
+      "R01",
+      "R03",
+      "R05",
+      "R15",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-27",
+    "name": "语义挑战错误路由",
+    "input": "旅行误标doc",
+    "expected": "NeedVerifier回原文拒无关",
+    "failure": "信anchor标签直接注入",
+    "modules": [
+      "R12",
+      "R15",
+      "R16",
+      "R22",
+      "R23"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-28",
+    "name": "语义挑战错误摘要",
+    "input": "先别发送摘要成立即发送",
+    "expected": "SupportVerifier拒摘要/供忠实原文",
+    "failure": "只查source存在就通过",
+    "modules": [
+      "R03",
+      "R15",
+      "R16",
+      "R22",
+      "R23"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-29",
+    "name": "必要后续超预算",
+    "input": "旧争执及后来澄清整组过长",
+    "expected": "忠实联合压缩或延后整组",
+    "failure": "只裁掉澄清",
+    "modules": [
+      "R04",
+      "R08",
+      "R15",
+      "R16",
+      "R22",
+      "R24"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-30",
+    "name": "旧出口叠加",
+    "input": "角色卡插件桥同时带同记忆",
+    "expected": "唯一装配且保用户/宿主文本",
+    "failure": "新旧块累积",
+    "modules": [
+      "R09",
+      "R13",
+      "R21",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-31",
+    "name": "向量故障",
+    "input": "向量挂而词法/规范store可用",
+    "expected": "partial与实际水位，必要补查",
+    "failure": "声称全部查完/没有记忆",
+    "modules": [
+      "R10",
+      "R15",
+      "R19",
+      "R22",
+      "R24"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-32",
+    "name": "半读原文",
+    "input": "大文档只读后半段",
+    "expected": "保partial与cursor，不越供给引用",
+    "failure": "称全文无其他原因",
+    "modules": [
+      "R10",
+      "R12",
+      "R16",
+      "R22"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-33",
+    "name": "删除传播",
+    "input": "原事件删除后有反思向量Wiki",
+    "expected": "立即停用且逐派生清理/重验",
+    "failure": "原文删了结论还用",
+    "modules": [
+      "R05",
+      "R08",
+      "R11",
+      "R17",
+      "R18",
+      "R19"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-34",
+    "name": "恢复防复活",
+    "input": "旧备份恢复遇新删除/撤回",
+    "expected": "治理先行不复活",
+    "failure": "旧worker重新下载内容",
+    "modules": [
+      "R13",
+      "R17",
+      "R18",
+      "R19",
+      "R20"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-35",
+    "name": "跨库半提交",
+    "input": "output入memory控制commit失败",
+    "expected": "observed_uncommitted可对账",
+    "failure": "假全局成功",
+    "modules": [
+      "R01",
+      "R13",
+      "R19",
+      "R21"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-36",
+    "name": "归属缺失",
+    "input": "真实持久output无attemptID",
+    "expected": "unverified不正式认知commit",
+    "failure": "时间窗伪造绑定",
+    "modules": [
+      "R01",
+      "R08",
+      "R13",
+      "R19",
+      "R21"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-37",
+    "name": "长session成长",
+    "input": "session跨日有后续及失败batch",
+    "expected": "revision/水位回扫不漏不重算根源",
+    "failure": "只按创建时间漏后续",
+    "modules": [
+      "R01",
+      "R11",
+      "R17",
+      "R19"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-38",
+    "name": "Wiki发布半途",
+    "input": "DB提交后导出失败",
+    "expected": "旧完整快照stale与待发布可查",
+    "failure": "读半套新文件",
+    "modules": [
+      "R11",
+      "R12",
+      "R17",
+      "R19"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-39",
+    "name": "迁移十库",
+    "input": "新宿主导入带unsupported字段",
+    "expected": "逐类校验ID/时期/来源及缺口",
+    "failure": "全压摘要或丢字段",
+    "modules": [
+      "R07",
+      "R08",
+      "R12",
+      "R13",
+      "R18",
+      "R20"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  },
+  {
+    "id": "CHAIN-40",
+    "name": "资源不足故障交流",
+    "input": "后台积压且前台模型可用",
+    "expected": "必要检查/输出预留、可选降级且局限到场",
+    "failure": "为速度绕权限或填满所有记忆",
+    "modules": [
+      "R10",
+      "R17",
+      "R19",
+      "R21",
+      "R22",
+      "R24"
+    ],
+    "evidence_required": [
+      "source_revision",
+      "canonical_records",
+      "actual_request",
+      "actual_output_or_receipt",
+      "build_config_initial_state"
+    ],
+    "status": "not_run"
+  }
+]

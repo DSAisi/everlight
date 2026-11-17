@@ -1,0 +1,21 @@
+test_ambiguous_correction_blocks (__main__.Suite.test_ambiguous_correction_blocks) ... ok
+test_atomic_failure_and_reopen (__main__.Suite.test_atomic_failure_and_reopen) ... ok
+test_error_after_fact_insert_rolls_back_all (__main__.Suite.test_error_after_fact_insert_rolls_back_all) ... ok
+test_explicit_resolution (__main__.Suite.test_explicit_resolution) ... ok
+test_future_does_not_clear_dispute (__main__.Suite.test_future_does_not_clear_dispute) ... ok
+test_future_without_dispute (__main__.Suite.test_future_without_dispute) ... ok
+test_invalid_quote_does_not_write_claim (__main__.Suite.test_invalid_quote_does_not_write_claim) ... ok
+test_late_observation_not_current (__main__.Suite.test_late_observation_not_current) ... ok
+test_old_index_no_worker (__main__.Suite.test_old_index_no_worker) ... ok
+test_scope_and_idempotency (__main__.Suite.test_scope_and_idempotency) ... ok
+test_stale_auto_correction_preserves_input_and_replays (__main__.Suite.test_stale_auto_correction_preserves_input_and_replays) ... ok
+test_targeted_auto_correction_retains_unrelated_history (__main__.Suite.test_targeted_auto_correction_retains_unrelated_history) ... ok
+test_two_writers_same_revision_only_one_wins (__main__.Suite.test_two_writers_same_revision_only_one_wins) ... ok
+test_typo_leaves_dispute_and_event_count (__main__.Suite.test_typo_leaves_dispute_and_event_count) ... ok
+test_work_cached_revision_dependency_changes (__main__.Suite.test_work_cached_revision_dependency_changes) ... ok
+test_work_update_and_receipt_identity (__main__.Suite.test_work_update_and_receipt_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.018s
+
+OK

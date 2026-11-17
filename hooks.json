@@ -1,0 +1,476 @@
+{
+  "schema": "everlight.hooks/1",
+  "external_inputs": [
+    "authenticated_request",
+    "capability_probe",
+    "host_event",
+    "verified_patch",
+    "focus_hint",
+    "request_draft",
+    "actual_provider_request",
+    "actual_host_output",
+    "actual_executor_event",
+    "optional_user_feedback",
+    "committed_cursor",
+    "authorized_governance_cmd",
+    "authorized_recovery_cmd",
+    "frozen_cases"
+  ],
+  "terminal_outputs": [
+    "action_decision",
+    "restored_cursor",
+    "restored_focus",
+    "followup_query",
+    "evaluation_receipt",
+    "strategy_candidate"
+  ],
+  "hooks": [
+    {
+      "id": "H00",
+      "name": "接入与能力握手",
+      "modules": [
+        "R21",
+        "R18",
+        "R24"
+      ],
+      "inputs": [
+        "authenticated_request",
+        "capability_probe"
+      ],
+      "outputs": [
+        "trusted_scope",
+        "capability_set"
+      ],
+      "phase": "host",
+      "failure": "认证失败拒绝；缺能力只降低接入档位",
+      "acceptance": "capability_degrade"
+    },
+    {
+      "id": "H01",
+      "name": "入账与原文保全",
+      "modules": [
+        "R01",
+        "R19"
+      ],
+      "inputs": [
+        "trusted_scope",
+        "host_event"
+      ],
+      "outputs": [
+        "event_receipt",
+        "source_ref"
+      ],
+      "phase": "durable",
+      "failure": "未写入不报已保存；断网持久队列需显式状态",
+      "acceptance": "transaction_reopen"
+    },
+    {
+      "id": "H02",
+      "name": "局部线索与人物绑定",
+      "modules": [
+        "R02",
+        "R07"
+      ],
+      "inputs": [
+        "source_ref",
+        "trusted_scope"
+      ],
+      "outputs": [
+        "cue_set",
+        "identity_candidates"
+      ],
+      "phase": "turn",
+      "failure": "引用、同名和否定有歧义则只给候选，不合并身份",
+      "acceptance": "same_name"
+    },
+    {
+      "id": "H03",
+      "name": "当轮时态纠错",
+      "modules": [
+        "R05",
+        "R01",
+        "R18"
+      ],
+      "inputs": [
+        "event_receipt",
+        "cue_set",
+        "identity_candidates",
+        "verified_patch"
+      ],
+      "outputs": [
+        "claim_heads",
+        "dispute_fence"
+      ],
+      "phase": "durable",
+      "failure": "版本冲突重新核证；可界定则标时段争议，未绑定先保留原话",
+      "acceptance": "targeted_correction"
+    },
+    {
+      "id": "H04",
+      "name": "工作台更新与恢复",
+      "modules": [
+        "R03",
+        "R12",
+        "R13"
+      ],
+      "inputs": [
+        "event_receipt",
+        "claim_heads",
+        "dispute_fence",
+        "focus_hint",
+        "trusted_scope"
+      ],
+      "outputs": [
+        "work_snapshot"
+      ],
+      "phase": "turn",
+      "failure": "读取依赖版本；同名任务需澄清；未知送达不得继续发送",
+      "acceptance": "resume_v2"
+    },
+    {
+      "id": "H05",
+      "name": "经历与认知提案",
+      "modules": [
+        "R04",
+        "R08",
+        "R09",
+        "R07"
+      ],
+      "inputs": [
+        "source_ref",
+        "identity_candidates",
+        "work_snapshot"
+      ],
+      "outputs": [
+        "state_candidates",
+        "episode_ref"
+      ],
+      "phase": "turn",
+      "failure": "事实、表达和推断分开；没有证据可以不更新",
+      "acceptance": "affect_repair"
+    },
+    {
+      "id": "H06",
+      "name": "召回规划与查找",
+      "modules": [
+        "R15",
+        "R24"
+      ],
+      "inputs": [
+        "work_snapshot",
+        "cue_set",
+        "state_candidates",
+        "claim_heads",
+        "dispute_fence",
+        "trusted_scope",
+        "capability_set"
+      ],
+      "outputs": [
+        "recall_candidates"
+      ],
+      "phase": "turn",
+      "failure": "索引落后回规范库；时间/字节有界；无历史需要仍做最低检查",
+      "acceptance": "stale_index"
+    },
+    {
+      "id": "H07",
+      "name": "原文、反证与覆盖",
+      "modules": [
+        "R16",
+        "R10",
+        "R12"
+      ],
+      "inputs": [
+        "recall_candidates",
+        "source_ref",
+        "trusted_scope"
+      ],
+      "outputs": [
+        "evidence_bundle",
+        "coverage"
+      ],
+      "phase": "turn",
+      "failure": "原文不可读标缺口；闭包不完整整组不装配",
+      "acceptance": "partial_evidence"
+    },
+    {
+      "id": "H08",
+      "name": "请求前装配与替换",
+      "modules": [
+        "R22",
+        "R21",
+        "R18",
+        "R24"
+      ],
+      "inputs": [
+        "evidence_bundle",
+        "coverage",
+        "work_snapshot",
+        "request_draft",
+        "capability_set"
+      ],
+      "outputs": [
+        "prepared_request",
+        "attempt_binding"
+      ],
+      "phase": "host",
+      "failure": "只替宿主所有的动态块；移除过期块；相关不足仍可普通对话",
+      "acceptance": "replace_messages"
+    },
+    {
+      "id": "H09",
+      "name": "实际请求读回",
+      "modules": [
+        "R21",
+        "R23"
+      ],
+      "inputs": [
+        "prepared_request",
+        "attempt_binding",
+        "actual_provider_request"
+      ],
+      "outputs": [
+        "request_receipt"
+      ],
+      "phase": "host",
+      "failure": "读不到就记 unverified；不以组装副本替代；真实输出另验",
+      "acceptance": "provider_readback"
+    },
+    {
+      "id": "H10",
+      "name": "实际输出观察",
+      "modules": [
+        "R21",
+        "R19"
+      ],
+      "inputs": [
+        "request_receipt",
+        "actual_host_output",
+        "attempt_binding"
+      ],
+      "outputs": [
+        "output_receipt"
+      ],
+      "phase": "host",
+      "failure": "输出按 run/attempt 绑定；无绑定记 unverified 不提交自我变化",
+      "acceptance": "visible_output"
+    },
+    {
+      "id": "H11",
+      "name": "动作前门禁",
+      "modules": [
+        "R14",
+        "R18",
+        "R21"
+      ],
+      "inputs": [
+        "action_intent",
+        "work_snapshot",
+        "claim_heads",
+        "dispute_fence",
+        "trusted_scope",
+        "capability_set"
+      ],
+      "outputs": [
+        "action_decision"
+      ],
+      "phase": "host",
+      "failure": "权限未知/缺钩子/范围错则拒；发送结果未知只能查询状态",
+      "acceptance": "unknown_delivery"
+    },
+    {
+      "id": "H12",
+      "name": "实际行动回执",
+      "modules": [
+        "R14",
+        "R01",
+        "R03"
+      ],
+      "inputs": [
+        "action_decision",
+        "actual_executor_event"
+      ],
+      "outputs": [
+        "action_receipt",
+        "receipt_event"
+      ],
+      "phase": "host",
+      "failure": "拟议/尝试/已接受/送达分开；未知不重发",
+      "acceptance": "receipt_binding"
+    },
+    {
+      "id": "H13",
+      "name": "认知状态提交",
+      "modules": [
+        "R08",
+        "R09",
+        "R19",
+        "R21"
+      ],
+      "inputs": [
+        "state_candidates",
+        "output_receipt",
+        "trusted_scope"
+      ],
+      "outputs": [
+        "state_commit_receipt"
+      ],
+      "phase": "durable",
+      "failure": "CAS 或绑定失败只落待核记录；不写第二份当前状态",
+      "acceptance": "stale_state"
+    },
+    {
+      "id": "H14",
+      "name": "反馈闭环再入账",
+      "modules": [
+        "R01",
+        "R03",
+        "R11"
+      ],
+      "inputs": [
+        "receipt_event",
+        "output_receipt",
+        "action_receipt",
+        "state_commit_receipt",
+        "optional_user_feedback"
+      ],
+      "outputs": [
+        "feedback_event"
+      ],
+      "phase": "durable",
+      "failure": "没有真实反馈则未知；反馈不是成功的默认值",
+      "acceptance": "false_success"
+    },
+    {
+      "id": "H15",
+      "name": "后台领取与做梦",
+      "modules": [
+        "R17",
+        "R11",
+        "R06",
+        "R24"
+      ],
+      "inputs": [
+        "event_receipt",
+        "feedback_event",
+        "episode_ref",
+        "committed_cursor",
+        "trusted_scope"
+      ],
+      "outputs": [
+        "validated_patch"
+      ],
+      "phase": "job",
+      "failure": "租约/版本失效不提交；旧事件修订按水位补扫；候选可拒",
+      "acceptance": "dream_stale"
+    },
+    {
+      "id": "H16",
+      "name": "派生失效、投影与 Wiki",
+      "modules": [
+        "R17",
+        "R12",
+        "R15",
+        "R19"
+      ],
+      "inputs": [
+        "validated_patch",
+        "claim_heads",
+        "state_commit_receipt",
+        "governance_change"
+      ],
+      "outputs": [
+        "projection_receipt"
+      ],
+      "phase": "job",
+      "failure": "提交前重核授权和 CAS；立即阻旧使用；投影失败可重试并保水位",
+      "acceptance": "projection_fail"
+    },
+    {
+      "id": "H17",
+      "name": "治理与撤回",
+      "modules": [
+        "R18",
+        "R19"
+      ],
+      "inputs": [
+        "trusted_scope",
+        "authorized_governance_cmd"
+      ],
+      "outputs": [
+        "governance_change"
+      ],
+      "phase": "durable",
+      "failure": "当轮 tombstone 阻用；跨存储失效异步对账，阻所有复活路径",
+      "acceptance": "delete_restore"
+    },
+    {
+      "id": "H18",
+      "name": "恢复、迁移与对账",
+      "modules": [
+        "R19",
+        "R20",
+        "R13"
+      ],
+      "inputs": [
+        "governance_change",
+        "authorized_recovery_cmd",
+        "projection_receipt"
+      ],
+      "outputs": [
+        "restored_cursor",
+        "restored_focus"
+      ],
+      "phase": "job",
+      "failure": "先加载最新删除账；引用不齐标部分；未知外部动作不重做",
+      "acceptance": "restart_no_repeat"
+    },
+    {
+      "id": "H19",
+      "name": "持续需求观察与主动建议",
+      "modules": [
+        "R03",
+        "R14",
+        "R17",
+        "R24"
+      ],
+      "inputs": [
+        "work_snapshot",
+        "coverage",
+        "feedback_event",
+        "capability_set"
+      ],
+      "outputs": [
+        "action_intent",
+        "followup_query"
+      ],
+      "phase": "host",
+      "failure": "节流、暂停及撤销有权；建议不等于执行；前台注入不靠提醒分数",
+      "acceptance": "proactive_permission"
+    },
+    {
+      "id": "H20",
+      "name": "对照评估与受控 RSI",
+      "modules": [
+        "R23",
+        "R17",
+        "R15",
+        "R22"
+      ],
+      "inputs": [
+        "request_receipt",
+        "output_receipt",
+        "action_receipt",
+        "projection_receipt",
+        "frozen_cases"
+      ],
+      "outputs": [
+        "evaluation_receipt",
+        "strategy_candidate"
+      ],
+      "phase": "job",
+      "failure": "候选无法改验收、授权和发布；失败保反例；回退策略不回滚事实",
+      "acceptance": "rsi_holdout"
+    }
+  ]
+}

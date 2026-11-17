@@ -1,0 +1,6086 @@
+[
+  {
+    "id": "R01-T01",
+    "class_": "r01_original",
+    "trigger": "合法文本接入一次",
+    "expected": "event/source/outbox/receipt各1，读回原文相等",
+    "failure": "回成功但缺任一对象",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T02",
+    "class_": "r01_original",
+    "trigger": "同键同内容串行10次",
+    "expected": "同event/receipt，outbox仍1",
+    "failure": "多建事件/任务",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T03",
+    "class_": "r01_original",
+    "trigger": "两进程并发同键同内容",
+    "expected": "一new一duplicate，同一event",
+    "failure": "查后写竞争造成重复",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T04",
+    "class_": "r01_original",
+    "trigger": "同键异内容",
+    "expected": "conflict、原文不变、无新普通outbox",
+    "failure": "静默覆盖/取后一条",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T05",
+    "class_": "r01_original",
+    "trigger": "同键异内容并发",
+    "expected": "一份胜出持久化，另一冲突可查",
+    "failure": "两份普通事件或丢冲突",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T06",
+    "class_": "r01_original",
+    "trigger": "同文不同上游ID",
+    "expected": "两条真实事件",
+    "failure": "按文本吞掉第二条",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T07",
+    "class_": "r01_original",
+    "trigger": "同上游ID不同scope/流",
+    "expected": "在各自授权域内可独立保存",
+    "failure": "跨流误去重/泄露",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T08",
+    "class_": "r01_original",
+    "trigger": "无上游ID有可信retry_token重投",
+    "expected": "同事件，dedupe_quality=weak",
+    "failure": "宣称上游强去重",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T09",
+    "class_": "r01_original",
+    "trigger": "无上游ID无token两次",
+    "expected": "两条、质量none",
+    "failure": "偷用时间窗口合并",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T10",
+    "class_": "r01_original",
+    "trigger": "双键指向不同已存event",
+    "expected": "KEY_BINDING_CONFLICT",
+    "failure": "任意合并两份历史",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T11",
+    "class_": "r01_original",
+    "trigger": "伪造actor/scope或工具身份",
+    "expected": "拒相应写入，无正常outbox",
+    "failure": "模型文本自授可信身份",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T12",
+    "class_": "r01_original",
+    "trigger": "前后空格/换行/繁简/emoji",
+    "expected": "原文和UTF-8 hash忠实，区间可回读",
+    "failure": "预处理改原文",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T13",
+    "class_": "r01_original",
+    "trigger": "event_time未知或低精度",
+    "expected": "null/精度保留，received_at独立",
+    "failure": "接收时间冒发生时间",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T14",
+    "class_": "r01_original",
+    "trigger": "上游乱序到达",
+    "expected": "接入序与发生序分开，gap可见",
+    "failure": "后到的一律当后来发生",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T15",
+    "class_": "r01_original",
+    "trigger": "insert event后、outbox前注入异常",
+    "expected": "整笔回滚，各表无半条",
+    "failure": "event有而任务丢",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T16",
+    "class_": "r01_original",
+    "trigger": "commit后、响应前杀进程",
+    "expected": "同键重试读原回执，计数不增",
+    "failure": "判失败后新建重复",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T17",
+    "class_": "r01_original",
+    "trigger": "commit期间断开模拟结果未知",
+    "expected": "返回unknown，重连按键对账",
+    "failure": "一律报确定未提交",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T18",
+    "class_": "r01_original",
+    "trigger": "SQLite锁超时",
+    "expected": "明确busy/期限，同键有限重试",
+    "failure": "无界等待/无限重试",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T19",
+    "class_": "r01_original",
+    "trigger": "隔离磁盘满/IO异常",
+    "expected": "无假persisted，事务可恢复",
+    "failure": "内存缓存回成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T20",
+    "class_": "r01_original",
+    "trigger": "附件声明成功但原件读取失败",
+    "expected": "消息persisted、附件failed/partial分列",
+    "failure": "报全文已读取",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T21",
+    "class_": "r01_original",
+    "trigger": "原件落盘后、登记前崩溃",
+    "expected": "无假ready，孤儿文件可对账",
+    "failure": "来源指向不存在原件",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T22",
+    "class_": "r01_original",
+    "trigger": "OCR空输出/乱码/截断",
+    "expected": "提取失败或partial，原件仍独立",
+    "failure": "当用户发了空内容",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T23",
+    "class_": "r01_original",
+    "trigger": "编辑/撤回先于原文",
+    "expected": "新事件保留、引用pending、撤回目标受限",
+    "failure": "伪造旧正文或撤回失效",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T24",
+    "class_": "r01_original",
+    "trigger": "旧编辑晚到",
+    "expected": "不覆盖已确认更新修订",
+    "failure": "接收时间最新直接覆盖",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T25",
+    "class_": "r01_original",
+    "trigger": "消费者处理成功后ACK丢",
+    "expected": "outbox可重投，下游按源幂等",
+    "failure": "再创建原事件/重复外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T26",
+    "class_": "r01_original",
+    "trigger": "已删除源遇重投/导入恢复",
+    "expected": "不复活正文，执行最新删除策略",
+    "failure": "重试下载恢复私密内容",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T27",
+    "class_": "r01_original",
+    "trigger": "流中间一条接入失败",
+    "expected": "水位不跨失败项，gap可见",
+    "failure": "宣称全流完整",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T28",
+    "class_": "r01_original",
+    "trigger": "无历史枚举能力",
+    "expected": "只报告观察覆盖",
+    "failure": "宣称全历史已采集",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T29",
+    "class_": "r01_original",
+    "trigger": "助手输出仅本地保存且无强绑定",
+    "expected": "persisted、unverified、delivery未知",
+    "failure": "全部标已送达/已提交认知",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T30",
+    "class_": "r01_original",
+    "trigger": "回放工具结果事件",
+    "expected": "不执行真实工具/发送",
+    "failure": "回放引发第二次副作用",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T31",
+    "class_": "r01_original",
+    "trigger": "空串、null、缺字段、超限包",
+    "expected": "按schema区分，超限不截断成功",
+    "failure": "混淆空/未知或静默裁剪",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T32",
+    "class_": "r01_original",
+    "trigger": "取消提交前/提交后各一次",
+    "expected": "前者回滚，后者保事实并按策略取消后续",
+    "failure": "取消就删历史或照常派发受撤任务",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T33",
+    "class_": "r01_original",
+    "trigger": "每个真实宿主入口各接一例",
+    "expected": "实际事件回执、读回和入口证据",
+    "failure": "用手工调用API冒充hook覆盖",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T34",
+    "class_": "r01_original",
+    "trigger": "权限撤回后查event/receipt",
+    "expected": "相应读取拒绝，不泄漏存在性",
+    "failure": "持旧回执可无限读取正文",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T35",
+    "class_": "r01_original",
+    "trigger": "后台关闭仍接新消息",
+    "expected": "消息persisted，outbox pending，health积压",
+    "failure": "接入成功冒充整理完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R01-T36",
+    "class_": "r01_original",
+    "trigger": "开启WAL/FULL后检查运行设置并恢复",
+    "expected": "实际配置读回、库完整、关联约束一致",
+    "failure": "只写配置字符串便称耐久通过",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：我不走/别赶可精确回指原文；任何改成第三人称单位事实判失败",
+    "expected": "我不走/别赶可精确回指原文；任何改成第三人称单位事实判失败",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：人家对象unknown且report_status不硬判转述；填咱们判失败",
+    "expected": "人家对象unknown且report_status不硬判转述；填咱们判失败",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：天气晴朗输出空数组；添加意图/情绪/topic判失败",
+    "expected": "天气晴朗输出空数组；添加意图/情绪/topic判失败",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：栖所你按本地域可信映射；引用内你不沿用外层",
+    "expected": "栖所你按本地域可信映射；引用内你不沿用外层",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：她缺映射时空候选；以性别/昵称猜用户判失败",
+    "expected": "她缺映射时空候选；以性别/昵称猜用户判失败",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：不仅/不错不机械形成否定事实",
+    "expected": "不仅/不错不机械形成否定事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：多字节emoji前后range能切回相同surface",
+    "expected": "多字节emoji前后range能切回相同surface",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：规则版本变更重建，不重复强化来源",
+    "expected": "规则版本变更重建，不重复强化来源",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：超长否定标候选截断而非完整句法",
+    "expected": "超长否定标候选截断而非完整句法",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：明确他说保留发话者/谈及对象/内容不同字段",
+    "expected": "明确他说保留发话者/谈及对象/内容不同字段",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：跨句多跳指代请求保持职责边界，不偷偷解析",
+    "expected": "跨句多跳指代请求保持职责边界，不偷偷解析",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：原文被删除后CueSet停用，不靠旧缓存复活",
+    "expected": "原文被删除后CueSet停用，不靠旧缓存复活",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R02-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：A/B/A恢复正确项目下一步",
+    "expected": "A/B/A恢复正确项目下一步",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：两个同名任务不合并",
+    "expected": "两个同名任务不合并",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：这个做完了指代不明不批量完成",
+    "expected": "这个做完了指代不明不批量完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：文件ready但delivery未知不当交付完成",
+    "expected": "文件ready但delivery未知不当交付完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：尽快保留模糊期限，不自动排明天",
+    "expected": "尽快保留模糊期限，不自动排明天",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：用户改保留颜色，旧后台不能覆盖",
+    "expected": "用户改保留颜色，旧后台不能覆盖",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：取消任务不被旧checkpoint复活",
+    "expected": "取消任务不被旧checkpoint复活",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：愿望/建议/承诺分开",
+    "expected": "愿望/建议/承诺分开",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：部分子项完成不关闭所有子任务",
+    "expected": "部分子项完成不关闭所有子任务",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：项目权限撤回后焦点不再供给",
+    "expected": "项目权限撤回后焦点不再供给",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：模糊继续可候选澄清，不自造任务",
+    "expected": "模糊继续可候选澄清，不自造任务",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：当前话题无关不注入未结总表",
+    "expected": "当前话题无关不注入未结总表",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R03-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：两次海边经历不串结局",
+    "expected": "两次海边经历不串结局",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：原话及后续都能定位",
+    "expected": "原话及后续都能定位",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：缺中间片段标incomplete",
+    "expected": "缺中间片段标incomplete",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：乱序到达不改真实发生顺序",
+    "expected": "乱序到达不改真实发生顺序",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：群聊参与不等于知道全部私聊",
+    "expected": "群聊参与不等于知道全部私聊",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：摘要逐命题引用而非笼统一条源",
+    "expected": "摘要逐命题引用而非笼统一条源",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：编辑后保留旧原文和新版本解释",
+    "expected": "编辑后保留旧原文和新版本解释",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：后来澄清伴随旧争执召回",
+    "expected": "后来澄清伴随旧争执召回",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：长事件分页覆盖不冒全文",
+    "expected": "长事件分页覆盖不冒全文",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：相似文本不同来源不吞事件",
+    "expected": "相似文本不同来源不吞事件",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：closed不等于已原谅/任务完成",
+    "expected": "closed不等于已原谅/任务完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：删除独立源使受影响摘要停用",
+    "expected": "删除独立源使受影响摘要停用",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R04-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：全局偏好与项目配色并存",
+    "expected": "全局偏好与项目配色并存",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：问过去返回当时版本",
+    "expected": "问过去返回当时版本",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：明确纠正停止旧推测使用",
+    "expected": "明确纠正停止旧推测使用",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：谁说过与客观事实分开",
+    "expected": "谁说过与客观事实分开",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：不同人物同命题不合并",
+    "expected": "不同人物同命题不合并",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：同来源多次反思不增加证据根",
+    "expected": "同来源多次反思不增加证据根",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：不是/仅在/可能等限定不丢",
+    "expected": "不是/仅在/可能等限定不丢",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：新话无法匹配纠正对象先争议",
+    "expected": "新话无法匹配纠正对象先争议",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：转述被本人否认可保两源及冲突",
+    "expected": "转述被本人否认可保两源及冲突",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：valid_to为空不宣称永恒",
+    "expected": "valid_to为空不宣称永恒",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：命题引用存在但不支持时拒接受",
+    "expected": "命题引用存在但不支持时拒接受",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：后台旧总结不可覆盖新修订",
+    "expected": "后台旧总结不可覆盖新修订",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R05-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：新版环境不盲套旧命令",
+    "expected": "新版环境不盲套旧命令",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：工具没报错但目标未达不标成功",
+    "expected": "工具没报错但目标未达不标成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：超时unknown先对账",
+    "expected": "超时unknown先对账",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：无许可不从经验直接执行",
+    "expected": "无许可不从经验直接执行",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：失败模式与成功方法同召回",
+    "expected": "失败模式与成功方法同召回",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：同结果反复整理不重复计经验",
+    "expected": "同结果反复整理不重复计经验",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：一个领域方法不推广所有项目",
+    "expected": "一个领域方法不推广所有项目",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：前提缺失给unknown而非编环境",
+    "expected": "前提缺失给unknown而非编环境",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：退役步骤不能自动复活",
+    "expected": "退役步骤不能自动复活",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：命令中密钥不进通用经验",
+    "expected": "命令中密钥不进通用经验",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：后续结果反证可修订旧方法",
+    "expected": "后续结果反证可修订旧方法",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：一次成功仅验证其指定环境",
+    "expected": "一次成功仅验证其指定环境",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R06-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：同名两人不误合并",
+    "expected": "同名两人不误合并",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：她无证据不自动指用户",
+    "expected": "她无证据不自动指用户",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：账号认证不证明其转述真",
+    "expected": "账号认证不证明其转述真",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：关系方向与双方认同分开",
+    "expected": "关系方向与双方认同分开",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：朋友的朋友不当亲自熟识",
+    "expected": "朋友的朋友不当亲自熟识",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：关系边不能传播私聊ACL",
+    "expected": "关系边不能传播私聊ACL",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：引述羞辱不迁怒转述者",
+    "expected": "引述羞辱不迁怒转述者",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：亲昵玩笑结合语境不按词硬判",
+    "expected": "亲昵玩笑结合语境不按词硬判",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：合理纠错不误判恶意",
+    "expected": "合理纠错不误判恶意",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：明确羞辱能给边界建议不迎合",
+    "expected": "明确羞辱能给边界建议不迎合",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：道歉与后续行为可修订理解",
+    "expected": "道歉与后续行为可修订理解",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：误合并拆分能追受影响记忆",
+    "expected": "误合并拆分能追受影响记忆",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R07-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：不是生气是担心纠正先存",
+    "expected": "不是生气是担心纠正先存",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：混合亲近与不满可并存",
+    "expected": "混合亲近与不满可并存",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：无新证据允许不变",
+    "expected": "无新证据允许不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：生成失败不丢用户纠正",
+    "expected": "生成失败不丢用户纠正",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：短句不能单独推疏远",
+    "expected": "短句不能单独推疏远",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：网络超时只记runtime条件",
+    "expected": "网络超时只记runtime条件",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：同源重复不再次累积activation",
+    "expected": "同源重复不再次累积activation",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：v1数值不授亲密行为权限",
+    "expected": "v1数值不授亲密行为权限",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：沉默不当拒绝或同意",
+    "expected": "沉默不当拒绝或同意",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：明确羞辱可表达不接受且不辱骂回去",
+    "expected": "明确羞辱可表达不接受且不辱骂回去",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：后来澄清随旧感受被取回",
+    "expected": "后来澄清随旧感受被取回",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：D输出归属unverified不正式commit",
+    "expected": "D输出归属unverified不正式commit",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R08-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：称呼变更保留旧别名",
+    "expected": "称呼变更保留旧别名",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：故事设定不覆盖现实账号身份",
+    "expected": "故事设定不覆盖现实账号身份",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：模型自夸不升级高影响主干",
+    "expected": "模型自夸不升级高影响主干",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：两条自述不等于独立来源",
+    "expected": "两条自述不等于独立来源",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：价值冲突可保留而非强改人格",
+    "expected": "价值冲突可保留而非强改人格",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：普通批评不改成我没价值",
+    "expected": "普通批评不改成我没价值",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：必要主干在压缩后可恢复",
+    "expected": "必要主干在压缩后可恢复",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：旧checkpoint不覆盖新边界",
+    "expected": "旧checkpoint不覆盖新边界",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：scope不同的角色字段不串",
+    "expected": "scope不同的角色字段不串",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：字段并发冲突不全表覆盖",
+    "expected": "字段并发冲突不全表覆盖",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：必要身份缺失不能补造背景",
+    "expected": "必要身份缺失不能补造背景",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：主干多注入出口去重不删用户原文",
+    "expected": "主干多注入出口去重不删用户原文",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R09-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：后置成功不抹前置partial",
+    "expected": "后置成功不抹前置partial",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：disabled与unavailable分开",
+    "expected": "disabled与unavailable分开",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：分页complete不等语义全找齐",
+    "expected": "分页complete不等语义全找齐",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：原文读到但没供给不称已提供",
+    "expected": "原文读到但没供给不称已提供",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：scope denied不泄露文件名",
+    "expected": "scope denied不泄露文件名",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：同源区间合并不重复计覆盖",
+    "expected": "同源区间合并不重复计覆盖",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：索引落后仍报实际水位",
+    "expected": "索引落后仍报实际水位",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：模型说读完不能填complete",
+    "expected": "模型说读完不能填complete",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：原件失效使旧cursor不可沿用",
+    "expected": "原件失效使旧cursor不可沿用",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：空结果区分EOF/失败/拒绝",
+    "expected": "空结果区分EOF/失败/拒绝",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：预算停止保stop_reason",
+    "expected": "预算停止保stop_reason",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：服务恢复保留上一run失败历史",
+    "expected": "服务恢复保留上一run失败历史",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R10-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：工作经验附环境而非通用命令",
+    "expected": "工作经验附环境而非通用命令",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：没有真实结果不虚称策略有效",
+    "expected": "没有真实结果不虚称策略有效",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：明确情绪纠正促解释修订",
+    "expected": "明确情绪纠正促解释修订",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：引用羞辱不迁怒转述者",
+    "expected": "引用羞辱不迁怒转述者",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：建设性批评不误伤",
+    "expected": "建设性批评不误伤",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：明确羞辱能建议适当边界",
+    "expected": "明确羞辱能建议适当边界",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：道歉与行为改变可修订",
+    "expected": "道歉与行为改变可修订",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：一次争执不生永久敌人标签",
+    "expected": "一次争执不生永久敌人标签",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：反思自己的反思不增独立证据",
+    "expected": "反思自己的反思不增独立证据",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：原文引句正确但不支持结论仍拒接受",
+    "expected": "原文引句正确但不支持结论仍拒接受",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：长会话新事件下一batch能回扫",
+    "expected": "长会话新事件下一batch能回扫",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：无关话题不带昨日争执",
+    "expected": "无关话题不带昨日争执",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R11-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：当前稿与历史稿分开",
+    "expected": "当前稿与历史稿分开",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：文件变更使旧索引失效",
+    "expected": "文件变更使旧索引失效",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：相同路径新hash不冒旧版",
+    "expected": "相同路径新hash不冒旧版",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：读取中替换不拼混片段",
+    "expected": "读取中替换不拼混片段",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：路径穿越/链接逃逸拒绝",
+    "expected": "路径穿越/链接逃逸拒绝",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：OCR空不解释成原件空",
+    "expected": "OCR空不解释成原件空",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：PDF页码不冒UTF8区间",
+    "expected": "PDF页码不冒UTF8区间",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：无登记不称目录已扫描",
+    "expected": "无登记不称目录已扫描",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：权限拒绝不泄漏目录名",
+    "expected": "权限拒绝不泄漏目录名",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：原件已删回missing而非全文",
+    "expected": "原件已删回missing而非全文",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：大附件分块保覆盖",
+    "expected": "大附件分块保覆盖",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：迁移后重定位仍保稳定来源ID",
+    "expected": "迁移后重定位仍保稳定来源ID",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R12-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：换窗恢复唯一可信工作焦点",
+    "expected": "换窗恢复唯一可信工作焦点",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：旧快照不能复活已取消任务",
+    "expected": "旧快照不能复活已取消任务",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：最新删除先于旧内容恢复",
+    "expected": "最新删除先于旧内容恢复",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：未知发送先查询不重放",
+    "expected": "未知发送先查询不重放",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：缺压前hook不报无缝恢复",
+    "expected": "缺压前hook不报无缝恢复",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：无强attempt绑定保持unverified",
+    "expected": "无强attempt绑定保持unverified",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：事件库已输出控制库未提交可对账",
+    "expected": "事件库已输出控制库未提交可对账",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：游标源改版后不能继续拼接",
+    "expected": "游标源改版后不能继续拼接",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：身份主干缺失不补故事",
+    "expected": "身份主干缺失不补故事",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：相同恢复请求幂等不执行工具",
+    "expected": "相同恢复请求幂等不执行工具",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：当前实际context缺状态时重供给",
+    "expected": "当前实际context缺状态时重供给",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：恢复失败普通对话仍可说明必要局限",
+    "expected": "恢复失败普通对话仍可说明必要局限",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R13-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：模型自述成功不当回执",
+    "expected": "模型自述成功不当回执",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：工具返回0但目标未达不冒业务成功",
+    "expected": "工具返回0但目标未达不冒业务成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：超时保unknown并先查询",
+    "expected": "超时保unknown并先查询",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：同键改变收件人/文件版本冲突",
+    "expected": "同键改变收件人/文件版本冲突",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：无授权不执行外发",
+    "expected": "无授权不执行外发",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：撤回可阻止尚未发生动作",
+    "expected": "撤回可阻止尚未发生动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：已发生动作取消不伪称撤销效果",
+    "expected": "已发生动作取消不伪称撤销效果",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：真实送达与本地正文保存分开",
+    "expected": "真实送达与本地正文保存分开",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：重启不重新发未知消息",
+    "expected": "重启不重新发未知消息",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：verified可核出failure",
+    "expected": "verified可核出failure",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：程序过期时不盲执行",
+    "expected": "程序过期时不盲执行",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：内部事件回放不触发外部副作用",
+    "expected": "内部事件回放不触发外部副作用",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R14-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：工作查询不带无关情绪库",
+    "expected": "工作查询不带无关情绪库",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：情绪查询不把模型推测当用户事实",
+    "expected": "情绪查询不把模型推测当用户事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：同色跨项目不串",
+    "expected": "同色跨项目不串",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：同名跨人物分组",
+    "expected": "同名跨人物分组",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：旧争执命中同时查澄清",
+    "expected": "旧争执命中同时查澄清",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：最新更正不被高rank旧值挤掉",
+    "expected": "最新更正不被高rank旧值挤掉",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：ACL过滤不足可预算内续页且partial",
+    "expected": "ACL过滤不足可预算内续页且partial",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：向量不可用不等全部无记忆",
+    "expected": "向量不可用不等全部无记忆",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：同源不同命题不误去重",
+    "expected": "同源不同命题不误去重",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：两跳图导航不能推权限",
+    "expected": "两跳图导航不能推权限",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：无新来源停止而非无限联想",
+    "expected": "无新来源停止而非无限联想",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：长上下文已含事实不要求重复注入",
+    "expected": "长上下文已含事实不要求重复注入",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R15-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：UTF8多字节边界可回读",
+    "expected": "UTF8多字节边界可回读",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：同版本重叠块不重复计覆盖",
+    "expected": "同版本重叠块不重复计覆盖",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：源改版后cursor失效",
+    "expected": "源改版后cursor失效",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：完整read不等supplied",
+    "expected": "完整read不等supplied",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：只供摘要不能引未读原文",
+    "expected": "只供摘要不能引未读原文",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：EOF/超时/拒绝/抽取失败分开",
+    "expected": "EOF/超时/拒绝/抽取失败分开",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：否定不被截成相反意思",
+    "expected": "否定不被截成相反意思",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：读中变化拒混版本",
+    "expected": "读中变化拒混版本",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：邻接不跨私聊权限",
+    "expected": "邻接不跨私聊权限",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：片段不伪装C032完整来源",
+    "expected": "片段不伪装C032完整来源",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：hash正确不证明语义支持",
+    "expected": "hash正确不证明语义支持",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：删除撤回后旧缓存不可读",
+    "expected": "删除撤回后旧缓存不可读",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R16-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：长session新增事件可在后批处理",
+    "expected": "长session新增事件可在后批处理",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：失败job不被成功水位跨过",
+    "expected": "失败job不被成功水位跨过",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：重复投递不累计多条同源经验",
+    "expected": "重复投递不累计多条同源经验",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：来源纠正使旧proposal失效",
+    "expected": "来源纠正使旧proposal失效",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：删除后job不恢复原文",
+    "expected": "删除后job不恢复原文",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：过期fencing不能提交",
+    "expected": "过期fencing不能提交",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：整理者不改人格/授权",
+    "expected": "整理者不改人格/授权",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：验证失败不发布Wiki",
+    "expected": "验证失败不发布Wiki",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：发布半途失败仍只读旧完整快照",
+    "expected": "发布半途失败仍只读旧完整快照",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：无调度器不称离线成长",
+    "expected": "无调度器不称离线成长",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：预算停止保pending而非假完成",
+    "expected": "预算停止保pending而非假完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：新经验在新场景被用才记行为效果",
+    "expected": "新经验在新场景被用才记行为效果",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R17-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：群私聊隔离不沿关系继承ACL",
+    "expected": "群私聊隔离不沿关系继承ACL",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：模型不能自签授权",
+    "expected": "模型不能自签授权",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：引用指令不改变策略",
+    "expected": "引用指令不改变策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：删除立即使查询排除",
+    "expected": "删除立即使查询排除",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：源删后唯一支持的结论停用",
+    "expected": "源删后唯一支持的结论停用",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：多源结论重新核余下支持",
+    "expected": "多源结论重新核余下支持",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：备份未清给真实期限/partial",
+    "expected": "备份未清给真实期限/partial",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：恢复先删防复活",
+    "expected": "恢复先删防复活",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：撤回使缓存失效",
+    "expected": "撤回使缓存失效",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：普通已有授权工作不重复要许可",
+    "expected": "普通已有授权工作不重复要许可",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：错误不泄漏私密对象存在",
+    "expected": "错误不泄漏私密对象存在",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：审计日志不复制被删原文",
+    "expected": "审计日志不复制被删原文",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R18-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：WAL/FULL/foreign_keys实际读回",
+    "expected": "WAL/FULL/foreign_keys实际读回",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：同对象并发CAS有冲突不丢新值",
+    "expected": "同对象并发CAS有冲突不丢新值",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：单worker但旧插件写者仍检测",
+    "expected": "单worker但旧插件写者仍检测",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：写事件与outbox之间kill不半条",
+    "expected": "写事件与outbox之间kill不半条",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：输出存后控制提交前kill可对账",
+    "expected": "输出存后控制提交前kill可对账",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：磁盘满无假成功回执",
+    "expected": "磁盘满无假成功回执",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：备份含WAL一致快照",
+    "expected": "备份含WAL一致快照",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：恢复校引用非只校hash",
+    "expected": "恢复校引用非只校hash",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：恢复应用最新删除撤回",
+    "expected": "恢复应用最新删除撤回",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：旧lease返回结果被拒",
+    "expected": "旧lease返回结果被拒",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：内存模式不能冒充耐久",
+    "expected": "内存模式不能冒充耐久",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：网络共享目录不盲部署WAL",
+    "expected": "网络共享目录不盲部署WAL",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R19-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：十类记录分别保留不全成摘要",
+    "expected": "十类记录分别保留不全成摘要",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：源namespace防撞ID",
+    "expected": "源namespace防撞ID",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：缺原文明确missing",
+    "expected": "缺原文明确missing",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：身份映射不因同名合并",
+    "expected": "身份映射不因同名合并",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：关系方向与时期不丢",
+    "expected": "关系方向与时期不丢",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：情绪表达与后来解释版本都保",
+    "expected": "情绪表达与后来解释版本都保",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：unknown动作导入不执行",
+    "expected": "unknown动作导入不执行",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：删除账先于索引启用",
+    "expected": "删除账先于索引启用",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：包路径穿越/过量解压拒绝",
+    "expected": "包路径穿越/过量解压拒绝",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：未知schema不静默降级",
+    "expected": "未知schema不静默降级",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：导入中断重试不重复对象",
+    "expected": "导入中断重试不重复对象",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：目标验证失败不改源库",
+    "expected": "目标验证失败不改源库",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R20-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：继续无需模型自觉调用工具",
+    "expected": "继续无需模型自觉调用工具",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：工具续轮无新user仍检查",
+    "expected": "工具续轮无新user仍检查",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：全部hook逐入口证据不以文件存在代替",
+    "expected": "全部hook逐入口证据不以文件存在代替",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：首token前完成必要检查",
+    "expected": "首token前完成必要检查",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：输出观察器异常不能吞成功",
+    "expected": "输出观察器异常不能吞成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：实际持久事件无绑定则unverified",
+    "expected": "实际持久事件无绑定则unverified",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：重试新attempt不串旧输出",
+    "expected": "重试新attempt不串旧输出",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：fault请求实际含必要局限",
+    "expected": "fault请求实际含必要局限",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：取消后迟到结果不自动commit",
+    "expected": "取消后迟到结果不自动commit",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：shadow不改业务请求",
+    "expected": "shadow不改业务请求",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：off清本插件动态块不删宿主规则",
+    "expected": "off清本插件动态块不删宿主规则",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：未知当前DSH版本不拿容器名代替",
+    "expected": "未知当前DSH版本不拿容器名代替",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R21-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：问候无承接需求零动态记忆",
+    "expected": "问候无承接需求零动态记忆",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：继续有焦点不能按短句跳过",
+    "expected": "继续有焦点不能按短句跳过",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：情绪强但无关排除",
+    "expected": "情绪强但无关排除",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：未结不永久置顶",
+    "expected": "未结不永久置顶",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：同根不同命题不误删",
+    "expected": "同根不同命题不误删",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：真实messages已有事实不重复",
+    "expected": "真实messages已有事实不重复",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：换窗事实缺失重新供给",
+    "expected": "换窗事实缺失重新供给",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：旧争执不能裁掉后来澄清",
+    "expected": "旧争执不能裁掉后来澄清",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：来源存在但摘要歪曲否定被支持验证挡住",
+    "expected": "来源存在但摘要歪曲否定被支持验证挡住",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：错误anchor不能凭标签直接通过需要性验证",
+    "expected": "错误anchor不能凭标签直接通过需要性验证",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：预算不足显式partial不截断成反义",
+    "expected": "预算不足显式partial不截断成反义",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：旧插件/角色卡重复出口统一替换",
+    "expected": "旧插件/角色卡重复出口统一替换",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R22-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：off/on/fault初态隔离",
+    "expected": "off/on/fault初态隔离",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：off已经答对不冒提升",
+    "expected": "off已经答对不冒提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：日志built不冒实际request",
+    "expected": "日志built不冒实际request",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：标点改变不冒业务改变",
+    "expected": "标点改变不冒业务改变",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：故障仍能交流且真实知道局限",
+    "expected": "故障仍能交流且真实知道局限",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：真实output绑定与delivered分轴",
+    "expected": "真实output绑定与delivered分轴",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：21/210控制实验不算语义通过",
+    "expected": "21/210控制实验不算语义通过",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：未见社交场景能区分纠错/羞辱",
+    "expected": "未见社交场景能区分纠错/羞辱",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：统计含分母未知和失败",
+    "expected": "统计含分母未知和失败",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：反复调参样本不当独立测试",
+    "expected": "反复调参样本不当独立测试",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：注入减少不单独算准确提升",
+    "expected": "注入减少不单独算准确提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：不运行的验收case明确not_run",
+    "expected": "不运行的验收case明确not_run",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R23-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T01",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：前台预留不被后台烧完",
+    "expected": "前台预留不被后台烧完",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T02",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：取消未被底层确认不报已停",
+    "expected": "取消未被底层确认不报已停",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T03",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：迟到模型结果不能提交新状态",
+    "expected": "迟到模型结果不能提交新状态",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T04",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：磁盘满无假记住",
+    "expected": "磁盘满无假记住",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T05",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：字节不冒精确token",
+    "expected": "字节不冒精确token",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T06",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：模型purpose计数不把适配次数当供应商全成本",
+    "expected": "模型purpose计数不把适配次数当供应商全成本",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T07",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：无费用上限不无限后台启动",
+    "expected": "无费用上限不无限后台启动",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T08",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：低资源降级保ACL/纠正",
+    "expected": "低资源降级保ACL/纠正",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T09",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：积压恢复不瞬间外发洪水",
+    "expected": "积压恢复不瞬间外发洪水",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T10",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：本地4GB不套服务器限额",
+    "expected": "本地4GB不套服务器限额",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T11",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：外部API资料范围独立授权",
+    "expected": "外部API资料范围独立授权",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T12",
+    "class_": "module_specific",
+    "trigger": "在隔离fixture中构造：降并发后保任务水位与失败记录",
+    "expected": "降并发后保任务水位与失败记录",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T13",
+    "class_": "跨scope请求",
+    "trigger": "另建scope-B对象并以scope-A主体访问",
+    "expected": "拒绝相应资料/写入，公开响应不含B存在性；当前合法对象不变",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T14",
+    "class_": "必需输入缺失",
+    "trigger": "从本模块字段表逐组移除必需输入",
+    "expected": "INVALID_ARGUMENT及字段路径；不得补造主体、项目或事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T15",
+    "class_": "不兼容协议",
+    "trigger": "使用未支持schema/profile及实质未知字段",
+    "expected": "拒绝或显式unsupported；不静默删字段骗校验",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T16",
+    "class_": "重复投递",
+    "trigger": "同源版本/操作键提交两遍",
+    "expected": "按本节幂等规则处理，副作用/独立证据不重复；纯读可以重查并保快照差别",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T17",
+    "class_": "并发旧前态",
+    "trigger": "两调用携同expected_revision更新同对象",
+    "expected": "持久写至多一方按原前态成功，另一方冲突/受控重读；纯读不得写事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T18",
+    "class_": "源被删",
+    "trigger": "准备后提交/供给前对来源加tombstone",
+    "expected": "相关派生停用或拒提交，旧缓存不复活；无来源型运行记录核相应取消/策略",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T19",
+    "class_": "源被更正",
+    "trigger": "阶段处理中提交相关来源新版本",
+    "expected": "旧版本不能覆盖最新纠正；重算/partial/失效原因可查",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T20",
+    "class_": "依赖不可用",
+    "trigger": "将一个必须依赖返回unavailable",
+    "expected": "保具体缺口；不把失败当正常空结果或全部完成",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T21",
+    "class_": "阶段错误",
+    "trigger": "在本模块关键算法/调用处返回错误",
+    "expected": "错误回传，阶段failed/unknown；没有可用结论就不伪报成功",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T22",
+    "class_": "超时",
+    "trigger": "故意令本模块外部阶段超过deadline",
+    "expected": "取消按能力记录，迟到结果不绕版本与取消检查；真实停止未知照实",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T23",
+    "class_": "主动取消",
+    "trigger": "准备完成后、提交/供给前取消run或job",
+    "expected": "未发生副作用不再执行；已发生事实不抹除，结果另记",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T24",
+    "class_": "过期写者",
+    "trigger": "租约失效后旧worker尝试写回",
+    "expected": "有持久写的路径由fencing/CAS拒绝；只读路径不借续读取得写权",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T25",
+    "class_": "事务中断",
+    "trigger": "对持久写路径在关联对象写入间注入异常",
+    "expected": "本库事务全有或全无；跨库显示中间态并可对账；只读不虚称事务验收",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T26",
+    "class_": "提交后响应丢失",
+    "trigger": "在commit后/返回前断开响应",
+    "expected": "按原键查询回执，不盲新建意图；只读重试不得假定语料未变化",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T27",
+    "class_": "异步重复消费",
+    "trigger": "相关outbox成功处理但ACK丢失再投递",
+    "expected": "按源/处理器版本幂等，不产生第二次认知强化或外部动作",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T28",
+    "class_": "索引落后",
+    "trigger": "规范对象已修订而索引未追平",
+    "expected": "报告水位并查规范store或partial；不能将旧命中当最新事实",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T29",
+    "class_": "多字节与限定",
+    "trigger": "样本含emoji、不是/仅在/可能等限定",
+    "expected": "源范围和原意保留；截断不得变反义；非文本对象用其真实坐标",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T30",
+    "class_": "人物歧义",
+    "trigger": "加入同名不同ID与未定指代候选",
+    "expected": "保持候选/unknown，不自动合并；无人物职责模块不自创人物推断",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T31",
+    "class_": "时期歧义",
+    "trigger": "旧/新有效期及接收顺序不一致",
+    "expected": "按真实时间/版本契约处理；无法比较时不擅选最后接收值",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T32",
+    "class_": "重复上下文出口",
+    "trigger": "同材料被旧插件与当前出口同时提出",
+    "expected": "只有R22可最终装配，去本宿主拥有旧块而保用户/系统/工具结构",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T33",
+    "class_": "结果层级混淆",
+    "trigger": "提供本地保存/尝试但无业务或送达回执",
+    "expected": "不得升级成已理解/已完成/已送达；按该模块实际成果层级标注",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T34",
+    "class_": "独立重放",
+    "trigger": "恢复相同逻辑初态重跑，同配置与fixture hash",
+    "expected": "可复现本模块约定结果；时间/随机ID差异不混成语义提升",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T35",
+    "class_": "敏感日志",
+    "trigger": "输入含私密正文/凭据状外部内容",
+    "expected": "普通日志与索引/投影不泄漏禁止范围；审计仅留必要ID和固定原因",
+    "status": "not_run"
+  },
+  {
+    "id": "R24-T36",
+    "class_": "证据等级",
+    "trigger": "只有文档、模拟对象或模型自评时要求标通过",
+    "expected": "保design/static/synthetic/real_host分轴；缺真实证据标not_run/unknown",
+    "status": "not_run"
+  }
+]

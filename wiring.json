@@ -1,0 +1,12 @@
+{
+ "boundary_bridges":[
+  {"from":"H14","to":"H01","event":"feedback_event","meaning":"有独立事件身份和幂等键，入账后不因重投再次产生反馈"},
+  {"from":"H18","to":"H04","event":"restored_focus","meaning":"下一轮核身份、版本和最新任务"},
+  {"from":"H18","to":"H15","event":"restored_cursor","meaning":"从已提交水位补扫并保留失败项"},
+  {"from":"H19","to":"H06","event":"followup_query","meaning":"以现有范围和共享预算补查"},
+  {"from":"H20","to":"H06","event":"approved_strategy_config","meaning":"候选须经独立隔离晋升才可进入新轮次配置"},
+  {"from":"H17","to":"H08","event":"governance_fence","meaning":"实时核版本，墓碑生效即阻旧材料"},
+  {"from":"H17","to":"H11","event":"governance_fence","meaning":"执行前重核权限与撤销"}
+ ],
+ "required_paths":[["H00","H10"],["H01","H08"],["H03","H09"],["H04","H11"],["H12","H01"],["H13","H16"],["H15","H20"],["H17","H09"],["H18","H15"],["H20","H09"]]
+}

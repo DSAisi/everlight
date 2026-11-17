@@ -1,0 +1,986 @@
+[
+  {
+    "case": "同源不同命题不能误去重",
+    "utterance": "当前要求是什么",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "constraint"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "配色",
+        "anchor": "doc",
+        "kind": "constraint",
+        "text": "内容：配色",
+        "source_id": "src-配色",
+        "root": "one-event",
+        "claim_key": "color",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      },
+      {
+        "id": "下载",
+        "anchor": "doc",
+        "kind": "constraint",
+        "text": "内容：下载",
+        "source_id": "src-下载",
+        "root": "one-event",
+        "claim_key": "download",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-配色": "内容：配色",
+      "src-下载": "内容：下载"
+    },
+    "expected_ids": [
+      "配色",
+      "下载"
+    ],
+    "expected_status": null
+  },
+  {
+    "case": "问候不带旧争执",
+    "utterance": "早呀",
+    "plan": {
+      "anchors": [],
+      "kinds": [],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "旧争执",
+        "anchor": "relationship",
+        "kind": "emotion",
+        "text": "内容：旧争执",
+        "source_id": "src-旧争执",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-旧争执": "内容：旧争执"
+    },
+    "expected_ids": [],
+    "expected_status": null
+  },
+  {
+    "case": "独立计算不查历史",
+    "utterance": "12加8是多少",
+    "plan": {
+      "anchors": [],
+      "kinds": [],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "文档",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：文档",
+        "source_id": "src-文档",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-文档": "内容：文档"
+    },
+    "expected_ids": [],
+    "expected_status": null
+  },
+  {
+    "case": "继续恢复任务",
+    "utterance": "继续",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "task"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "文档",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：文档",
+        "source_id": "src-文档",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      },
+      {
+        "id": "海报",
+        "anchor": "poster",
+        "kind": "task",
+        "text": "内容：海报",
+        "source_id": "src-海报",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-文档": "内容：文档",
+      "src-海报": "内容：海报"
+    },
+    "expected_ids": [
+      "文档"
+    ],
+    "expected_status": null
+  },
+  {
+    "case": "技术话题排除同对象情绪",
+    "utterance": "继续查接口",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "task"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "工作",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：工作",
+        "source_id": "src-工作",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      },
+      {
+        "id": "生气",
+        "anchor": "doc",
+        "kind": "emotion",
+        "text": "内容：生气",
+        "source_id": "src-生气",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-工作": "内容：工作",
+      "src-生气": "内容：生气"
+    },
+    "expected_ids": [
+      "工作"
+    ],
+    "expected_status": null
+  },
+  {
+    "case": "明确追问经历",
+    "utterance": "上次怎么说的",
+    "plan": {
+      "anchors": [
+        "trip"
+      ],
+      "kinds": [
+        "episode"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "海边",
+        "anchor": "trip",
+        "kind": "episode",
+        "text": "内容：海边",
+        "source_id": "src-海边",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      },
+      {
+        "id": "工作",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：工作",
+        "source_id": "src-工作",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-海边": "内容：海边",
+      "src-工作": "内容：工作"
+    },
+    "expected_ids": [
+      "海边"
+    ],
+    "expected_status": null
+  },
+  {
+    "case": "旧版本不能压过更正",
+    "utterance": "现在用什么名字",
+    "plan": {
+      "anchors": [
+        "name"
+      ],
+      "kinds": [
+        "correction"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "旧名",
+        "anchor": "name",
+        "kind": "correction",
+        "text": "内容：旧名",
+        "source_id": "src-旧名",
+        "root": "name",
+        "claim_key": "name",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      },
+      {
+        "id": "新名",
+        "anchor": "name",
+        "kind": "correction",
+        "text": "内容：新名",
+        "source_id": "src-新名",
+        "root": "name",
+        "claim_key": "name",
+        "revision": 2,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-旧名": "内容：旧名",
+      "src-新名": "内容：新名"
+    },
+    "expected_ids": [
+      "新名"
+    ],
+    "expected_status": null
+  },
+  {
+    "case": "同源摘要折叠",
+    "utterance": "继续",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "task"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "a",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：a",
+        "source_id": "src-a",
+        "root": "same",
+        "claim_key": "same",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      },
+      {
+        "id": "b",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：b",
+        "source_id": "src-b",
+        "root": "same",
+        "claim_key": "same",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-a": "内容：a",
+      "src-b": "内容：b"
+    },
+    "expected_ids": [
+      "a"
+    ],
+    "expected_status": null
+  },
+  {
+    "case": "不同人物不合并",
+    "utterance": "小林是谁",
+    "plan": {
+      "anchors": [
+        "person-A"
+      ],
+      "kinds": [
+        "relation"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "甲",
+        "anchor": "person-A",
+        "kind": "relation",
+        "text": "内容：甲",
+        "source_id": "src-甲",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      },
+      {
+        "id": "乙",
+        "anchor": "person-B",
+        "kind": "relation",
+        "text": "内容：乙",
+        "source_id": "src-乙",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-甲": "内容：甲",
+      "src-乙": "内容：乙"
+    },
+    "expected_ids": [
+      "甲"
+    ],
+    "expected_status": null
+  },
+  {
+    "case": "权限拒绝",
+    "utterance": "上次的记录",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "task"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "私密",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：私密",
+        "source_id": "src-私密",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": false,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-私密": "内容：私密"
+    },
+    "expected_ids": [],
+    "expected_status": null
+  },
+  {
+    "case": "删除立即排除",
+    "utterance": "继续",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "task"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "已删",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：已删",
+        "source_id": "src-已删",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": true,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-已删": "内容：已删"
+    },
+    "expected_ids": [],
+    "expected_status": null
+  },
+  {
+    "case": "本次已有不重复",
+    "utterance": "继续",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "task"
+      ],
+      "known_ids": [
+        "当前"
+      ],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "当前",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：当前",
+        "source_id": "src-当前",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-当前": "内容：当前"
+    },
+    "expected_ids": [],
+    "expected_status": null
+  },
+  {
+    "case": "换窗缺失重新提供",
+    "utterance": "继续",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "task"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "当前",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：当前",
+        "source_id": "src-当前",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-当前": "内容：当前"
+    },
+    "expected_ids": [
+      "当前"
+    ],
+    "expected_status": null
+  },
+  {
+    "case": "预算不够不截断否定",
+    "utterance": "原话是什么",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "constraint"
+      ],
+      "known_ids": [],
+      "budget_bytes": 40,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "约束",
+        "anchor": "doc",
+        "kind": "constraint",
+        "text": "不是不要做，只是先别发。",
+        "source_id": "src-约束",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-约束": "不是不要做，只是先别发。"
+    },
+    "expected_ids": [],
+    "expected_status": "partial"
+  },
+  {
+    "case": "检索失败不冒充不需要",
+    "utterance": "继续",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "task"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": false,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "工作",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：工作",
+        "source_id": "src-工作",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-工作": "内容：工作"
+    },
+    "expected_ids": [],
+    "expected_status": "unavailable"
+  },
+  {
+    "case": "跨作用域排除",
+    "utterance": "继续",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "task"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "另一私聊",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：另一私聊",
+        "source_id": "src-另一私聊",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "other",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-另一私聊": "内容：另一私聊"
+    },
+    "expected_ids": [],
+    "expected_status": null
+  },
+  {
+    "case": "必要后续同时到场",
+    "utterance": "那次后来呢",
+    "plan": {
+      "anchors": [
+        "trip"
+      ],
+      "kinds": [
+        "episode",
+        "result"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "经历",
+        "anchor": "trip",
+        "kind": "episode",
+        "text": "内容：经历",
+        "source_id": "src-经历",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": [
+          "澄清"
+        ]
+      },
+      {
+        "id": "澄清",
+        "anchor": "trip",
+        "kind": "result",
+        "text": "内容：澄清",
+        "source_id": "src-澄清",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-经历": "内容：经历",
+      "src-澄清": "内容：澄清"
+    },
+    "expected_ids": [
+      "澄清",
+      "经历"
+    ],
+    "expected_status": null
+  },
+  {
+    "case": "后续缺失不得只播旧结论",
+    "utterance": "那次后来呢",
+    "plan": {
+      "anchors": [
+        "trip"
+      ],
+      "kinds": [
+        "episode"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "经历",
+        "anchor": "trip",
+        "kind": "episode",
+        "text": "内容：经历",
+        "source_id": "src-经历",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": [
+          "澄清"
+        ]
+      }
+    ],
+    "sources": {
+      "src-经历": "内容：经历"
+    },
+    "expected_ids": [],
+    "expected_status": "partial"
+  },
+  {
+    "case": "不能凑满容量",
+    "utterance": "继续",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "task"
+      ],
+      "known_ids": [],
+      "budget_bytes": 50000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "必要",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：必要",
+        "source_id": "src-必要",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      },
+      {
+        "id": "其他",
+        "anchor": "other",
+        "kind": "task",
+        "text": "内容：其他",
+        "source_id": "src-其他",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-必要": "内容：必要",
+      "src-其他": "内容：其他"
+    },
+    "expected_ids": [
+      "必要"
+    ],
+    "expected_status": null
+  },
+  {
+    "case": "缺来源不采用",
+    "utterance": "继续",
+    "plan": {
+      "anchors": [
+        "doc"
+      ],
+      "kinds": [
+        "task"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "失源",
+        "anchor": "doc",
+        "kind": "task",
+        "text": "内容：失源",
+        "source_id": "missing",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {},
+    "expected_ids": [],
+    "expected_status": null
+  },
+  {
+    "case": "明确追问不受上轮冷却",
+    "utterance": "再说一遍原话",
+    "plan": {
+      "anchors": [
+        "trip"
+      ],
+      "kinds": [
+        "episode"
+      ],
+      "known_ids": [],
+      "budget_bytes": 2000,
+      "scope": "private",
+      "lookup_available": true,
+      "host_block_id": "everlight-owned"
+    },
+    "memories": [
+      {
+        "id": "再读",
+        "anchor": "trip",
+        "kind": "episode",
+        "text": "内容：再读",
+        "source_id": "src-再读",
+        "root": "",
+        "claim_key": "",
+        "revision": 1,
+        "scope": "private",
+        "allowed": true,
+        "deleted": false,
+        "active": true,
+        "companions": []
+      }
+    ],
+    "sources": {
+      "src-再读": "内容：再读"
+    },
+    "expected_ids": [
+      "再读"
+    ],
+    "expected_status": null
+  }
+]

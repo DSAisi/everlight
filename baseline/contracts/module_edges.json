@@ -1,0 +1,1369 @@
+{
+  "meaning": "capability dependencies, not recursive same-run calls",
+  "nodes": [
+    "R01",
+    "R02",
+    "R03",
+    "R04",
+    "R05",
+    "R06",
+    "R07",
+    "R08",
+    "R09",
+    "R10",
+    "R11",
+    "R12",
+    "R13",
+    "R14",
+    "R15",
+    "R16",
+    "R17",
+    "R18",
+    "R19",
+    "R20",
+    "R21",
+    "R22",
+    "R23",
+    "R24"
+  ],
+  "edges": [
+    {
+      "from": "R01",
+      "to": "R02",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R03",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R04",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R05",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R07",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R08",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R09",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R10",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R11",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R12",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R16",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R18",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R19",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R20",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R01",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R02",
+      "to": "R03",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R02",
+      "to": "R07",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R02",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R02",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R03",
+      "to": "R06",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R03",
+      "to": "R08",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R03",
+      "to": "R12",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R03",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R03",
+      "to": "R14",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R03",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R03",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R03",
+      "to": "R20",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R03",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R03",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R04",
+      "to": "R05",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R04",
+      "to": "R07",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R04",
+      "to": "R08",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R04",
+      "to": "R11",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R04",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R04",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R04",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R05",
+      "to": "R09",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R05",
+      "to": "R10",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R05",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R05",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R05",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R06",
+      "to": "R11",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R06",
+      "to": "R14",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R06",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R06",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R06",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R07",
+      "to": "R04",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R07",
+      "to": "R05",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R07",
+      "to": "R08",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R07",
+      "to": "R09",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R07",
+      "to": "R11",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R07",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R07",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R07",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R07",
+      "to": "R18",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R07",
+      "to": "R20",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R07",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R08",
+      "to": "R07",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R08",
+      "to": "R09",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R08",
+      "to": "R11",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R08",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R08",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R08",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R08",
+      "to": "R20",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R08",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R09",
+      "to": "R03",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R09",
+      "to": "R08",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R09",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R09",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R09",
+      "to": "R18",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R09",
+      "to": "R20",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R09",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R09",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R10",
+      "to": "R11",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R10",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R10",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R10",
+      "to": "R16",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R10",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R10",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R10",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R10",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R10",
+      "to": "R24",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R11",
+      "to": "R05",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R11",
+      "to": "R06",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R11",
+      "to": "R07",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R11",
+      "to": "R08",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R11",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R11",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R11",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R11",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R12",
+      "to": "R03",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R12",
+      "to": "R04",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R12",
+      "to": "R06",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R12",
+      "to": "R10",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R12",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R12",
+      "to": "R14",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R12",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R12",
+      "to": "R16",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R12",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R12",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R13",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R13",
+      "to": "R19",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R13",
+      "to": "R20",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R13",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R13",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R13",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R14",
+      "to": "R03",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R14",
+      "to": "R04",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R14",
+      "to": "R06",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R14",
+      "to": "R08",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R14",
+      "to": "R11",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R14",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R14",
+      "to": "R18",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R14",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R14",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R15",
+      "to": "R10",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R15",
+      "to": "R11",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R15",
+      "to": "R16",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R15",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R15",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R15",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R16",
+      "to": "R04",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R16",
+      "to": "R10",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R16",
+      "to": "R11",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R16",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R16",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R16",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R16",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R16",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R17",
+      "to": "R05",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R17",
+      "to": "R06",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R17",
+      "to": "R07",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R17",
+      "to": "R08",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R17",
+      "to": "R11",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R17",
+      "to": "R12",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R17",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R17",
+      "to": "R18",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R17",
+      "to": "R19",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R17",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R17",
+      "to": "R24",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R01",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R02",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R03",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R04",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R05",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R06",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R07",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R08",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R09",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R10",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R11",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R12",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R14",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R16",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R19",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R20",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R18",
+      "to": "R24",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R19",
+      "to": "R01",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R19",
+      "to": "R10",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R19",
+      "to": "R12",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R19",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R19",
+      "to": "R14",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R19",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R19",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R19",
+      "to": "R18",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R19",
+      "to": "R20",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R19",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R19",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R19",
+      "to": "R24",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R20",
+      "to": "R12",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R20",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R20",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R20",
+      "to": "R18",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R20",
+      "to": "R19",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R20",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R20",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R21",
+      "to": "R01",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R21",
+      "to": "R10",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R21",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R21",
+      "to": "R14",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R21",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R21",
+      "to": "R18",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R21",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R21",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R21",
+      "to": "R24",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R22",
+      "to": "R10",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R22",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R22",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R22",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R22",
+      "to": "R24",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R01",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R03",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R04",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R05",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R06",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R07",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R08",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R09",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R11",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R12",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R23",
+      "to": "R24",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R24",
+      "to": "R10",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R24",
+      "to": "R13",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R24",
+      "to": "R15",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R24",
+      "to": "R16",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R24",
+      "to": "R17",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R24",
+      "to": "R19",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R24",
+      "to": "R21",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R24",
+      "to": "R22",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    },
+    {
+      "from": "R24",
+      "to": "R23",
+      "protocol": "GLOBAL_PROTOCOL/1",
+      "dispatch": "host_coordinator_or_durable_job"
+    }
+  ]
+}
